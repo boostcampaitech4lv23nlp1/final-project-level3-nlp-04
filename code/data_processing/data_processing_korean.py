@@ -7,6 +7,7 @@ import numpy as np
 import re
 from bs4 import BeautifulSoup
 from tqdm import tqdm
+import shutil
 
 root_path = '../../data/'
 
@@ -53,18 +54,18 @@ def find_content(tag, raw_corpus):
 
 
 zip_file = root_path + 'NIKL_NP_v1.2(비출판물말뭉치).zip'
-file = root_path + '비출판물말뭉치'
+folder = root_path + '비출판물말뭉치'
 
-success, fail = unzip(zip_file, file) # 압축파일명, 생성할 폴더명
+success, fail = unzip(zip_file, folder) # 압축파일명, 생성할 폴더명
 print(f'success : {success}\t fail : {fail}') # success : 10757	 fail : 0
 
 
-pdf_file_path =file +'/NIKL_NP_v1.2/국립국어원 비출판물 말뭉치(버전 1.2)/국립국어원 비출판물 말뭉치(버전 1.1).pdf'
+pdf_file_path =folder +'/NIKL_NP_v1.2/국립국어원 비출판물 말뭉치(버전 1.2)/국립국어원 비출판물 말뭉치(버전 1.1).pdf'
 
 if os.path.exists(pdf_file_path):
     os.remove(pdf_file_path)
     
-file_list = glob.glob(file+'/NIKL_NP_v1.2/국립국어원 비출판물 말뭉치(버전 1.2)/*') # 폴더안에 pdf 파일은 삭제한 상태
+file_list = glob.glob(folder+'/NIKL_NP_v1.2/국립국어원 비출판물 말뭉치(버전 1.2)/*') # 폴더안에 pdf 파일은 삭제한 상태
 
 corpus = []
 for file_path in tqdm(file_list):
@@ -93,3 +94,7 @@ df["id"]=list(range(len(df)))
 df = df[['id','diary','comment','emotion','source']]
 
 df.to_csv(root_path+'국립국어원_비출판물.csv',index=False)
+
+# 폴더 삭제
+if os.path.exists(folder):  
+    shutil.rmtree(folder)
