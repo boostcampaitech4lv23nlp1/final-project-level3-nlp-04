@@ -81,7 +81,7 @@ def train():
         eval_dataset=eval_dataset,          
         data_collator=data_collator,
         tokenizer=tokenizer,
-        compute_metrics=compute_metrics
+        compute_metrics=compute_metrics,
     )
 
     # last checkpoint 찾기.
@@ -117,6 +117,9 @@ def train():
     trainer.state.save_to_json(
         os.path.join(training_args.output_dir, "trainer_state.json")
     )
+
+    if training_args.push_to_hub:
+        trainer.push_to_hub()
 
 if __name__ == "__main__":
     train()
