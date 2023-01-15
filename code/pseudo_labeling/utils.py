@@ -23,7 +23,6 @@ def get_last_checkpoint(args: Arguments, training_args: TrainingArguments) -> Tu
     last_checkpoint = None
     if (
         os.path.isdir(training_args.output_dir)
-        and training_args.do_train
         and not training_args.overwrite_output_dir
     ):
         last_checkpoint = get_last_checkpoint(training_args.output_dir)
@@ -68,7 +67,7 @@ def compute_metrics(pred):
     # calculate accuracy using sklearn's function
     f1 = micro_f1(preds, labels)
     auprc = auprc_score(probs, labels)
-    acc = accuracy_score(labels, preds)  # 리더보드 평가에는 포함되지 않습니다.
+    acc = accuracy_score(labels, preds)
 
     return {
         'micro f1 score': f1,
