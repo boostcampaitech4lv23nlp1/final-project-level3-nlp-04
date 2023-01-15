@@ -51,7 +51,7 @@ class SentimentAnalysis():
             scores = softmax(outputs)
         
         if self.ckpt_name == 'matthewburke/korean_sentiment':
-            self.model.config.id2label = {0: 'negative', 1: 'positive'}
+            self.model.config.id2label = {0: '부정', 1: '긍정'}
         
         label = self.model.config.id2label[scores.argmax().item()]
         score = scores.max().item()
@@ -68,12 +68,12 @@ class SentimentAnalysis():
 if __name__ == '__main__':
     
     # huggingface repo or local path
-    sa = SentimentAnalysis("nlp04/korean_sentiment_analysis_dataset3")
+    sa = SentimentAnalysis("nlp04/korean_sentiment_analysis_dataset3_best")
     
     tqdm.pandas()
     
     # ../../data/ 에 있는 파일들에게 pseudo_labeling 적용해서 ../../data/pseudo_labeled 폴더에 저장
-    for filename in ['국립국어원_비출판물.csv', 'aihub_감성대화.csv']:
+    for filename in ['비출판물_정제.csv']:
         df = pd.read_csv('../../data/'+filename)
         
         
