@@ -21,3 +21,7 @@ python train.py \
 --wandb_entity \
 --wandb_project "test" \
 --wandb_name "test"
+# push_to_hub 관련 인자
+# --push_to_hub True \
+# --push_to_hub_model_id 'korean_sentiment_analysis_dataset3_best' \
+# --push_to_hub_organization 'nlp04'
