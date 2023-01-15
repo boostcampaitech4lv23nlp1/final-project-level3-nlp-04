@@ -88,6 +88,7 @@ def inference():
     
     predict_df['predict'] = preds_labels
     predict_df['logits'] = logits
+    predict_df['probs'] = probs.tolist()
     
     if not os.path.exists(training_args.output_dir):
         os.mkdir(training_args.output_dir)
