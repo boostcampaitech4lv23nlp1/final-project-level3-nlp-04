@@ -2,8 +2,7 @@ python inference.py \
 --output_dir ./models/train_dataset \
 --fp16 \
 --overwrite_output_dir \
---train_data ./data/emotion_all_20_train.csv \
---eval_data ./data/emotion_all_20_eval.csv \
+--eval_data "./data/NLP-04-최종 프로젝트 - 비출판물 말뭉치_정제(완료).csv" \
 --model_name_or_path ./models/train_dataset \
 --per_device_train_batch_size 32 \
 --per_device_eval_batch_size 32 \
