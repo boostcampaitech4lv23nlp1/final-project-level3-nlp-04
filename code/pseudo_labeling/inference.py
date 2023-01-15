@@ -53,6 +53,9 @@ def inference():
 
     # 데이터셋
     eval_df = pd.read_csv(args.eval_data)
+    if 'long_diary_split' in eval_df.columns:
+        eval_df.rename(columns = {'long_diary_split' : 'text'}, inplace = True)
+    
     eval_dataset = Dataset(eval_df, tokenizer, config)
     
 
