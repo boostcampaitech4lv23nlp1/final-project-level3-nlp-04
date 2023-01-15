@@ -96,36 +96,35 @@ def train():
     last_checkpoint = get_last_checkpoint(args, training_args)
 
     # Training
-    if training_args.do_train:
-        if last_checkpoint is not None:
-            checkpoint = last_checkpoint
-        elif os.path.isdir(args.model_name_or_path):
-            checkpoint = args.model_name_or_path
-        else:
-            checkpoint = None
-        train_result = trainer.train(resume_from_checkpoint=checkpoint)
-        trainer.save_model()  # Saves the tokenizer too for easy upload
+    if last_checkpoint is not None:
+        checkpoint = last_checkpoint
+    elif os.path.isdir(args.model_name_or_path):
+        checkpoint = args.model_name_or_path
+    else:
+        checkpoint = None
+    train_result = trainer.train(resume_from_checkpoint=checkpoint)
+    trainer.save_model()  # Saves the tokenizer too for easy upload
 
-        metrics = train_result.metrics
-        metrics["train_samples"] = len(train_dataset)
+    metrics = train_result.metrics
+    metrics["train_samples"] = len(train_dataset)
 
-        trainer.log_metrics("train", metrics)
-        trainer.save_metrics("train", metrics)
-        trainer.save_state()
+    trainer.log_metrics("train", metrics)
+    trainer.save_metrics("train", metrics)
+    trainer.save_state()
 
-        output_train_file = os.path.join(
-            training_args.output_dir, "train_results.txt")
+    output_train_file = os.path.join(
+        training_args.output_dir, "train_results.txt")
 
-        with open(output_train_file, "w") as writer:
-            logger.info("***** Train results *****")
-            for key, value in sorted(train_result.metrics.items()):
-                logger.info(f"  {key} = {value}")
-                writer.write(f"{key} = {value}\n")
+    with open(output_train_file, "w") as writer:
+        logger.info("***** Train results *****")
+        for key, value in sorted(train_result.metrics.items()):
+            logger.info(f"  {key} = {value}")
+            writer.write(f"{key} = {value}\n")
 
-        # State 저장
-        trainer.state.save_to_json(
-            os.path.join(training_args.output_dir, "trainer_state.json")
-        )
+    # State 저장
+    trainer.state.save_to_json(
+        os.path.join(training_args.output_dir, "trainer_state.json")
+    )
 
 if __name__ == "__main__":
     train()
