@@ -12,7 +12,8 @@ from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_sc
 
 logger = logging.getLogger(__name__)
 
-label_list = ['기쁨(행복한)', '고마운', '설레는(기대하는)', '사랑하는', '즐거운(신나는)', '일상적인', '다짐하는', '슬픔(우울한)', '힘듦(지침)', '짜증남', '걱정스러운(불안한)']
+
+label_list = ['기쁨(행복한)', '고마운', '설레는(기대하는)', '사랑하는', '즐거운(신나는)', '일상적인', '생각이 많은', '슬픔(우울한)', '힘듦(지침)', '짜증남', '걱정스러운(불안한)']
 
 id2label = {id: label for id, label in enumerate(label_list)}
 label2id = {label: id for id, label in enumerate(label_list)}

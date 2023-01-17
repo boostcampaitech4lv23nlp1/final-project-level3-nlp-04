@@ -2,8 +2,8 @@ python train.py \
 --output_dir ./models/train_dataset \
 --fp16 \
 --overwrite_output_dir \
---train_data ./data/emotion_all_20_train.csv \
---eval_data ./data/emotion_all_20_eval.csv \
+--train_data './data/kote_all - emotion_ver1_train.csv' \
+--eval_data './data/kote_all - emotion_ver1_test.csv' \
 --model_name_or_path klue/roberta-large \
 --per_device_train_batch_size 32 \
 --per_device_eval_batch_size 32 \
@@ -17,10 +17,10 @@ python train.py \
 --save_steps=1000 \
 --load_best_model_at_end \
 --evaluation_strategy steps \
---wandb_entity \
---wandb_project test \
---wandb_name test
+--wandb_entity sajo-tuna \
+--wandb_project roberta_large_emotion \
+--wandb_name exp1 \
 # push_to_hub 관련 인자
-# --push_to_hub True \
-# --push_to_hub_model_id 'korean_sentiment_analysis_dataset3_best' \
-# --push_to_hub_organization 'nlp04'
+--push_to_hub True \
+--push_to_hub_model_id 'kote_sentiment_roberta_large' \
+--push_to_hub_organization 'nlp04'

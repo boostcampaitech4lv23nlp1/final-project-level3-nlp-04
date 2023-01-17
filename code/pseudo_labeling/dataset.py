@@ -23,8 +23,8 @@ class Dataset(Dataset):
         inputs['attention_mask'] = self.tokenized_sentence['attention_mask'][index]
         inputs['token_type_ids'] = self.tokenized_sentence['token_type_ids'][index]
 
-        if "emotion" in self.df.columns:
-            labels = self.config.label2id[self.df["emotion"][index]]
+        if "label" in self.df.columns:
+            labels = self.config.label2id[self.df["label"][index]]
             inputs["labels"] = torch.tensor(labels)
 
         return inputs
