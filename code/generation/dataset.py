@@ -52,8 +52,9 @@ class Dataset(Dataset):
         # inputs["labels"] = labels['input_ids'][index]
 
         # return inputs
-        record = self.df.iloc[index]
-        diary, comment = record['long_diary_split'], record['comment']
+        line = self.df.iloc[index]
+        # 전처리: '\n', 및 좌우 공백 삭제.
+        diary, comment = line['long_diary_split'].replace('\n', '').strip(), line['comment'].replace('\n', '').strip()
 
         diary_tokens = [self.bos_token] + self.tokenizer.tokenize(diary) + [self.eos_token]
         comment_tokens = [self.bos_token] + self.tokenizer.tokenize(comment) + [self.eos_token]
