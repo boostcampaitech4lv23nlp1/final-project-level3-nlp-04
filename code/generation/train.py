@@ -79,29 +79,6 @@ def train():
     print("####### config: ", config)
     model = AutoModelForSeq2SeqLM.from_pretrained(
         args.model_name_or_path, config=config)
-    ### TODO: rouge score가 0점으로 나오고 있음. compute_metrics를 BLUE로 바꾸거나 rouge score 고치기.
-    rouge = datasets.load_metric("rouge")
-    def compute_metrics(pred):
-        labels_ids = pred.label_ids
-        pred_ids = pred.predictions
-
-        if isinstance(pred_ids, tuple):
-            pred_ids = pred_ids[0]
-            pred_ids = pred_ids.argmax(-1)
-        print('pred_ids: ', pred_ids[:1])
-        print('###pred_len: ', len(pred_ids[0]), len(pred_ids[1]))
-        pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=False)
-        labels_ids[labels_ids == -100] = tokenizer.pad_token_id
-        print('pred_str: ', pred_str[:10])
-        label_str = tokenizer.batch_decode(labels_ids, skip_special_tokens=True)
-        print("label_str: ", label_str[:1])
-        rouge_output = rouge.compute(predictions=pred_str, references=label_str, rouge_types=["rouge2"])["rouge2"].mid
-        print('### rouge_output: ', rouge_output)
-        return {
-            "rouge2_precision": round(rouge_output.precision, 4),
-            "rouge2_recall": round(rouge_output.recall, 4),
-            "rouge2_fmeasure": round(rouge_output.fmeasure, 4),
-        }
 
     # 데이터셋
     train_dataset = datasets.load_dataset('csv', data_files=args.train_data, split='train')
@@ -123,6 +100,8 @@ def train():
     data_collator = DataCollatorForSeq2Seq(
         tokenizer, pad_to_multiple_of=8 if training_args.fp16 else None, model = model
     )
+
+    metric_fn = partial(compute_metrics, tokenizer=tokenizer)
     
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model.to(device)
@@ -134,7 +113,7 @@ def train():
         eval_dataset=tokenized_eval_dataset,          
         data_collator=data_collator,
         tokenizer=tokenizer,
-        compute_metrics=compute_metrics,
+        compute_metrics=metric_fn,
     )
 
     # last checkpoint 찾기.
