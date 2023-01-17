@@ -66,13 +66,16 @@ def train():
 
     # # setting config for decoder
     model.config.decoder_start_token_id = tokenizer.cls_token_id
-    # model.config.eos_token_id = tokenizer.sep_token_id
-    # model.config.pad_token_id = tokenizer.pad_token_id
-    # model.config.min_length = 56
+    model.config.eos_token_id = tokenizer.sep_token_id
+    model.config.pad_token_id = tokenizer.pad_token_id
+    model.config.forced_eos_token_id = tokenizer.eos_token_id
+    model.config.min_length = 2
+    model.config.max_length = 10
     # model.config.config.no_repeat_ngram_size = 3
-    # model.config.early_stopping = True
-    # model.config.length_penalty = 2.0
-    # model.config.num_beams = 4
+    model.config.early_stopping = True
+    model.config.length_penalty = 0.0
+    model.config.num_labels=1
+    model.config.num_beams = 4
 
     ### TODO: rouge score가 0점으로 나오고 있음. compute_metrics를 BLUE로 바꾸거나 rouge score 고치기.
     rouge = datasets.load_metric("rouge")
@@ -86,8 +89,9 @@ def train():
 
         pred_str = tokenizer.batch_decode(pred_ids, skip_special_tokens=True)
         labels_ids[labels_ids == -100] = tokenizer.pad_token_id
+        print('pred_str: ', pred_str[:10])
         label_str = tokenizer.batch_decode(labels_ids, skip_special_tokens=True)
-
+        # print("label_str: ", label_str[:10])
         rouge_output = rouge.compute(predictions=pred_str, references=label_str, rouge_types=["rouge2"])["rouge2"].mid
         print('### rouge_output: ', rouge_output)
         return {
