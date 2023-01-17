@@ -3,6 +3,47 @@ import collections
 import six
 
 
+def get_lcs_table(ref, can):
+    """
+    Create 2-d LCS (Longest Common Subsequence) score table.
+    """
+    rows = len(ref)
+    cols = len(can)
+    lcs_table = [[0] * (cols + 1) for _ in range(rows + 1)]
+    for i in range(1, rows + 1):
+        for j in range(1, cols + 1):
+            if ref[i - 1] == can[j - 1]:
+                lcs_table[i][j] = lcs_table[i - 1][j - 1] + 1
+            else:
+                lcs_table[i][j] = max(lcs_table[i - 1][j], lcs_table[i][j - 1])
+    return lcs_table
+
+
+def score_lcs(target_tokens, prediction_tokens):
+    """
+    Computes LCS (Longest Common Subsequence) rouge scores.
+    최장 길이로 매칭되는 문자열 측정
+    Args:
+        target_tokens: Tokens from the target text.
+        prediction_tokens: Tokens from the predicted text.
+    Returns:
+        A Score object containing computed scores.
+    """
+    
+    if not target_tokens or not prediction_tokens:
+        return scoring.Score(precision=0, recall=0, fmeasure=0)
+
+    # Compute length of LCS from the bottom up in a table (DP appproach).
+    lcs_table = get_lcs_table(target_tokens, prediction_tokens)
+    lcs_length = lcs_table[-1][-1]
+    
+    precision = lcs_length / len(prediction_tokens)
+    recall = lcs_length / len(target_tokens)
+    fmeasure = scoring.fmeasure(precision, recall)
+    
+    return scoring.Score(precision=precision, recall=recall, fmeasure=fmeasure)
+
+    
 def create_ngrams(tokens, n):
     """
     Creates ngrams from the given list of tokens.

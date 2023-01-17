@@ -17,8 +17,11 @@ class KoreanRougeScorer(scoring.BaseScorer):
         result = {}
         
         for rouge_type in self.rouge_types:
+            # ROUGE-L
+            if rouge_type == "rougeL":
+                scores = score_lcs(target_tokens, prediction_tokens)
             # ROUGE-N
-            if re.match(r"rouge[0-9]$", six.ensure_str(rouge_type)):
+            elif re.match(r"rouge[0-9]$", six.ensure_str(rouge_type)):
                 n = int(rouge_type[5:]) # ex) rouge1 => 1
                 if n <= 0:
                     raise ValueError(f"rougen requires positive n: {rouge_type}")
