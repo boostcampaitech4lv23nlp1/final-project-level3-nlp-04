@@ -69,7 +69,7 @@ def train():
     config.pad_token_id = tokenizer.pad_token_id
     config.forced_eos_token_id = tokenizer.eos_token_id
     config.min_length = 1
-    config.max_length = 128 # TODO: args화
+    config.max_length = 64 # TODO: args화
     config.no_repeat_ngram_size = 2
     config.early_stopping = True
     config.length_penalty = 0.0
@@ -83,7 +83,7 @@ def train():
     # 데이터셋
     train_dataset = datasets.load_dataset('csv', data_files=args.train_data, split='train')
     eval_dataset = datasets.load_dataset('csv', data_files=args.eval_data, split='train')
-
+    train_dataset.shuffle(training_args.seed)
 
     # 데이터셋을 전처리합니다.
     prepro_fn = partial(tokenize_func, tokenizer=tokenizer, max_input_length=512, max_target_length=128) # TODO: max_len args화
@@ -154,7 +154,11 @@ def train():
         trainer.push_to_hub()
 
     # evaluation
-    trainer.evaluate()
-    
+    trainer.evaluate(
+        eval_dataset=tokenized_eval_dataset,
+        max_length=64,
+        num_beams=4
+    )
+
 if __name__ == "__main__":
     train()
