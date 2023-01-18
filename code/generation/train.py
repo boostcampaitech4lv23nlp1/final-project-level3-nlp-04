@@ -107,9 +107,6 @@ def train():
     train_dataset = datasets.load_dataset('csv', data_files=args.train_data, split='train')
     eval_dataset = datasets.load_dataset('csv', data_files=args.eval_data, split='train')
 
-    # 필요없는 칼럼을 삭제합니다.
-    train_dataset.remove_columns(['diary'])
-    eval_dataset.remove_columns(['diary'])
 
     # 데이터셋을 전처리합니다.
     prepro_fn = partial(tokenize_func, tokenizer=tokenizer, max_input_length=512, max_target_length=128) # TODO: max_len args화
@@ -119,6 +116,9 @@ def train():
     tokenized_eval_dataset = eval_dataset.map(prepro_fn,
                                                 batched=True,
                                                 )
+    # collator의 입력 형식에 맞게 wrangling합니다.
+    tokenized_train_dataset.remove_columns(train_dataset.column_names)
+    tokenized_eval_dataset.remove_columns(eval_dataset.column_names)
 
     data_collator = DataCollatorForSeq2Seq(
         tokenizer, pad_to_multiple_of=8 if training_args.fp16 else None, model = model
@@ -174,5 +174,8 @@ def train():
     if training_args.push_to_hub:
         trainer.push_to_hub()
 
+    # evaluation
+    trainer.evaluate()
+    
 if __name__ == "__main__":
     train()
