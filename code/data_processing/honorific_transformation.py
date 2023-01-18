@@ -18,8 +18,12 @@ def informal_to_honorific(sentence, honorific_model):
     Returns:
         result (str): 존댓말 변환이 적용된 문장
     """
-    
-    if sentence[-2] == "요" or sentence[-3:-2] == "니다":
+
+    # 너무 짧은 문장은 적용하지 않습니다.
+    if len(sentence) < 6:
+        return sentence
+
+    if "요" in sentence[-3:] or "니다" in sentence[-3:] or "시다" in sentence[-3:]:
         return sentence
         
     # 존댓말 모델이 용언의 활용형을 제대로 복원하지 못하는 이슈가 있기 때문에, 문장의 뒷부분만 존댓말로 바꿉니다.
@@ -47,16 +51,22 @@ def informal_to_honorific(sentence, honorific_model):
 
     # ㅂ닙니다 -> ㅂ니다 (바랍닙니다 -> 바랍니다)
     decomposed = hgtk.text.decompose(honorific)
-    sub = re.sub(r'([ㅏ-ㅣ][ㄱ-ㅎ]+ᴥ)(ㄴㅣㅂᴥㄴㅣᴥㄷㅏ)', r'\1니다', decomposed)
+    sub = re.sub(r'([ㅏ-ㅣ][ㄱ-ㅎ]+ᴥ)(ㄴㅣㅂᴥㄴㅣᴥㄷㅏᴥ)', r'\1니다', decomposed)
     honorific = hgtk.text.compose(sub)
+
     # ㅣ어지닙니다 -> ㅕ집니다 (느껴지닙니다 -> 느껴집니다)
     decomposed = hgtk.text.decompose(honorific)
     sub = re.sub(r'(ㅣᴥㅇㅓᴥ)(ㅈㅣᴥㄴㅣㅂᴥ)', r'ㅕ집', decomposed)
     honorific = hgtk.text.compose(sub)
 
+    # ㅣ어지어 -> ㅕ져 (느끼어지었네요 -> 느껴졌네요)
+    decomposed = hgtk.text.decompose(honorific)
+    sub = re.sub(r'(ㅣᴥㅇㅓᴥㅈㅣᴥㅇㅓᴥ?)([ㄱ-ㅎ]?)', r'ㅕ져\2', decomposed)
+    honorific = hgtk.text.compose(sub)
+
     # ㅏ-ㅣ 자 -> ㅏ-ㅣ 요
     decomposed = hgtk.text.decompose(honorific)
-    sub = re.sub(r'([ㅏ-ㅣ])ᴥ(ㅈㅏᴥ)', r'\1요', decomposed)
+    sub = re.sub(r'([ㅏ-ㅣ]ᴥ)(ㅈㅏᴥ)', r'\1요', decomposed)
     honorific = hgtk.text.compose(sub)
     # ㅏ-ㅣ 이었 -> ㅏ-ㅣ였
     decomposed = hgtk.text.decompose(honorific)
@@ -67,50 +77,75 @@ def informal_to_honorific(sentence, honorific_model):
 
     # 기타 오류 수정
     honorific = honorific.replace('하어', '해')
-    honorific = honorific.replace('했다.', '했습니다.')
-    honorific = honorific.replace('이다.', '입니다.')
-    honorific = honorific.replace('었다.', '었습니다.')
-    honorific = honorific.replace('있다.', '있습니다.')
-    honorific = honorific.replace('갔다.', '갔습니다.')
-    honorific = honorific.replace('입닙니다.', '입니다.')
-    honorific = honorific.replace('습닙니다.', '습니다.')
+    # honorific = honorific.replace('했다.', '했습니다.')
+    # honorific = honorific.replace('이다.', '입니다.')
+    # honorific = honorific.replace('었다.', '었습니다.')
+    # honorific = honorific.replace('있다.', '있습니다.')
+    # honorific = honorific.replace('갔다.', '갔습니다.')
+    honorific = honorific.replace('입닙니다', '입니다')
+    honorific = honorific.replace('습닙니다', '습니다')
+    honorific = honorific.replace('같입니다', '같아요')
     honorific = honorific.replace('()', '')
     honorific = honorific.replace('  ', ' ')
     honorific = honorific.replace('즐겁은', '즐거운')
+    honorific = honorific.replace('즐겁었', '즐거웠')
     honorific = honorific.replace('쉽어', '쉬워')
     honorific = honorific.replace('쉽었', '쉬워')
+    honorific = honorific.replace('어렵을', '어려울')
+    honorific = honorific.replace('어렵은', '어려운')
+    honorific = honorific.replace('어렵어', '어려워')
+    honorific = honorific.replace('어렵었', '어려웠')
     honorific = honorific.replace('놀랍어', '놀라워')
     honorific = honorific.replace('놀랍었', '놀라웠')
-    
+    honorific = honorific.replace('바라닙니다', '바랍니다')
+    honorific = honorific.replace('드리닙니다', '드립니다')
+    honorific = honorific.replace('하닙니다', '합니다')
+    honorific = honorific.replace('하닙니다', '합니다')
+
+    honorific = honorific.replace('져ㅆ', '졌')
+    # print('###', honorific)
     # 습니다체로 변경이 안 된 경우 마지막 부분에 '-요' 첨가
     if '니다' not in honorific and honorific[-2] != "요" and honorific[-2] != "죠":
         honorific = honorific[:-1] + '요.'
 
     result = sentence_front + honorific
-    # 해요체 오류 수정
+    # 해요체 자연스럽게 수정
     result = result.replace('구나요', '군요')
     result = result.replace('요요', '요')
+    result = result.replace('좋어요', '좋아')
     result = result.replace('이어요', '예요')
+    result = result.replace('이야요', '이에요')
     result = result.replace('지요', '죠')
     result = result.replace('지어요', '져요')
     result = result.replace('겠다요', '겠어요')
     result = result.replace('어떻을', '어떨')
+    result = result.replace('해보요', '해봐요')
+    result = result.replace('어 보요', '어봐요')
+    result = result.replace('어보요', '어봐요')
+    result = result.replace('바래어요', '바라요')
+    result = result.replace('하어요', '해요')
+    result = result.replace('거이겠', '것이겠')
+    result = result.replace('거이에요', '거예요')
+    result = result.replace('거니다', '거예요')
+    result = result.replace('거이죠', '거죠')
+    result = result.replace('팅요', '팅이에요') # (화이팅)
+    result = result.replace('가어보요', '가봐요')
+    result = result.replace('내어보요', '내봐요')
+    result = result.replace('오었다요', '왔어요')
+    result = result.replace('오어요', '와요')
+    result = result.replace('주어요', '줘요')
+    
     # 맞춤법 검사
-    result = spell_checker.check(result).as_dict()['checked'].strip()
+    try:
+        result = spell_checker.check(result).as_dict()['checked'].strip()
+    except:
+        pass
+    print('###', result)
     return result
 
-# model = Changer()
-# result = informal_to_honorific("제주도를 가게 되어 너무나 기쁘게 생각하고 있구나!", model)
-# print(result)
-# result = informal_to_honorific("이런 기회는 없는 것 같아", model)
-# print(result)
-# result = informal_to_honorific("마음껏 즐기고 사진도 많이 찍어서 추억을 남기는 것이 좋을 것 같아!", model)
-# print(result)
-# result = informal_to_honorific("그리고 마스크를 꼭 챙겨서 안전하게 여행하는 것을 잊지 말고, 바로 자는 것도 잊지 말고 즐거운 여행이 되길 바래!", model)
-# print(result)
 
 def split_sentence(text):
-    return split_sentences(text)
+    return split_sentences(str(text))
 
 
 def honorific_transformation(text, honorific_model):
@@ -163,11 +198,33 @@ model = Changer()
 # r = honorific_transformation("생신에 가장 적합한 케이크를 사드려서 아빠께 감동을 주셨군요! 편지도 썼고, 촛불도 밝혔으니 아빠의 생신을 축하하는 감사한 마음이 느껴집니다. 고마워요!", model)
 # print(r)
 
+# r = honorific_transformation("요리를 해보니 백종원처럼 될 수 있겠구나 하는 생각이 들었구나! 찹쌀쫀바기는 정말 맛있고 귀여운 모양이구나! 다양한 모양으로 만들어보면 좋을 것 같아. 찹쌀쫀바기는 바삭바삭하고 쫀득하기 때문에 정말 맛있게 먹을 수 있어! 하루하루 백종원 처럼 요리사가 될 수 있게 노력해보자!", model)
+# print(r)
+# r = honorific_transformation("좋은 생각이네요! 반장이 되었을 때는 친구들에게 도움을 줄 수 있고, 남을 먼저 생각하는 모범적인 반장으로 자리를 잘 지킬 수 있기를 바랍니다. 그리고 반장이 되었을 때는 열심히 일하고 모두가 함께해서 반을 한결같이 만들어 나갈 수 있도록 노력하세요!", model)
+# print(r)
+# r = honorific_transformation("좋은 하루를 보내셨군요! 이런 쉬는 날은 가끔은 좋죠. 여유롭게 다양한 것들을 해보면 생각보다 더 행복하고 기분이 좋아질 거라고 생각합니다. 감사합니다.", model)
+# print(r)
+# r = honorific_transformation("정말 멋진 여행이었구나! 너무 좋은 추억이 될 것 같아. 사람들이 친절한 것도 너무 좋았고, 빵이 맛있었으면 하는 마음까지 느껴졌네. 그리고 너무 좋은 풍경을 볼 수 있었어. 이렇게 좋은 여행이라면 더 많은 사람들과 함께 떠나보는 것도 좋겠어!", model)
+# print(r)
+# r = honorific_transformation("그렇기 때문에, 로봇이 인간보다 똑똑해질 수는 있지만, 이는 로봇이 스스로 자아를 가지고 인간을 공격하는 것이 아니라, 인간이 로봇에게 인간의 지식과 기술을 주는 것에 의해 발생할 수 있는 것이라고 생각합니다. 그래서 로봇이 인간보다 똑똑해질 수 있는 것은 인간이 로봇에게 더 많은 것을 주는 것에 의해 발생할 수 있는 것입니다.", model)
+# print(r)
+# r = honorific_transformation("오 재미있고 즐거운 여행이었구나! 런던은 정말 멋진 도시야. 다음번에도 즐거운 여행이 되길 바래!", model)
+# print(r)
+# r = honorific_transformation("좋은 시간을 보냈구나! 보드게임과 짜바게티를 같이 먹으면서 즐거운 시간을 보냈으니 너무 좋았겠네. 앞으로도 가족들과 함께 즐거운 시간을 보내보자!", model)
+# print(r)
+# r = honorific_transformation("좋은 공개수업이었구나! 다양한 감각적 표현을 연습하며 기억에 남을 수 있었겠구나. 오감놀이는 감각적 표현을 연습하는 것도 좋지만, 모둠발표를 통해 같이 배우는 것도 좋았을 것 같아. 이런 창의적인 공개수업을 통해 감각적 표현력을 길러보는 것도 좋을 것 같아!", model)
+# print(r)
+
+# r = honorific_transformation("우와, 쿠키 수업이라니! 너무 즐거운 수업이었구나! 쿠키를 손으로 만들어 보니까 너무 재밌게 보였겠어. 맛도 맛있게 먹었구나. 다음에는 더 다양한 맛의 쿠키를 만들어 보는 건 어떨까? 꼭 다시 한번 만들어 보자!", model)
+# print(r)
+
 
 if __name__ == "__main__":
     df_list = os.listdir("./csvs")
+    model = Changer()
     for file in df_list:
         df = pd.read_csv(os.path.join('csvs', file))
-        df['honorific_comment'] = df['comment'].apply(lambda x: honorific_transformation(x))
+        df['honorific_comment'] = df['comment'].apply(lambda x: honorific_transformation(x, model))
+        save_name = file[:-4] + '_honorific.csv'
+        df.to_csv(os.path.join('csvs_results', save_name))
 
-    
