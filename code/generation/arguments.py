@@ -44,3 +44,38 @@ class Arguments:
     wandb_name: str = field(
         default="None_name",
     )
+
+
+@dataclass
+class ConfigArguments:
+    """
+    Arguments for config setting
+    """
+
+    min_length: int = field(
+        default=1
+    )
+
+    max_length: int = field(
+        default=128
+    )
+
+    no_repeat_ngram_size: int = field(
+        default=2
+    )
+
+    early_stopping: bool = field(
+        default=True
+    )
+
+    length_penalty: float = field(
+        default=0.0
+    )
+
+    num_labels: int = field(
+        default=1
+    )
+
+    num_beams: int = field(
+        default=4
+    )
