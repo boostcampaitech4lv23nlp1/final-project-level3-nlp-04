@@ -25,18 +25,19 @@ from transformers import (
 from transformers.optimization import AdamW, get_cosine_schedule_with_warmup
 
 
-from arguments import Arguments
+from arguments import *
 from utils import *
 from preprocessing import tokenize_func
+from get_model import get_model_func
 
 
 def train():
     parser = HfArgumentParser(
-        (Arguments, Seq2SeqTrainingArguments)
+        (Arguments, ConfigArguments, Seq2SeqTrainingArguments)
     )
     logger = logging.getLogger(__name__)
 
-    args, training_args = parser.parse_args_into_dataclasses()
+    args, config_args, training_args = parser.parse_args_into_dataclasses()
     wandb.init(project=args.wandb_project,
                entity=args.wandb_entity, name=args.wandb_name)
 
@@ -55,30 +56,12 @@ def train():
 
     # config, tokenizer, model
     config = AutoConfig.from_pretrained(args.model_name_or_path)
+
     tokenizer = AutoTokenizer.from_pretrained(
         args.model_name_or_path, max_length=args.max_seq_length)
-    # config.label2id = label2id
-    # config.id2label = id2label
-    # config.num_labels = len(label2id)
-    # # setting config for decoder
-    # TODO: arg 인자로 넣기.
-    # config.decoder_start_token_id = tokenizer.cls_token_id
-    print("####### cls token: ", tokenizer.cls_token_id)
-    print("####### eos token: ", tokenizer.eos_token_id)
-    config.eos_token_id = tokenizer.sep_token_id
-    config.pad_token_id = tokenizer.pad_token_id
-    config.forced_eos_token_id = tokenizer.eos_token_id
-    config.min_length = 1
-    config.max_length = 128 # TODO: args화
-    config.no_repeat_ngram_size = 2
-    config.early_stopping = True
-    config.length_penalty = 0.0
-    config.num_labels=1
-    config.num_beams = 4
 
+    model = get_model_func(config, args, config_args, tokenizer)
     print("####### config: ", config)
-    model = AutoModelForSeq2SeqLM.from_pretrained(
-        args.model_name_or_path, config=config)
 
     # 데이터셋
     train_dataset = datasets.load_dataset('csv', data_files=args.train_data, split='train')
