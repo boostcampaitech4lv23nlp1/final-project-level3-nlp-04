@@ -69,7 +69,7 @@ def train():
     train_dataset.shuffle(training_args.seed)
 
     # 데이터셋을 전처리합니다.
-    prepro_fn = partial(tokenize_func, tokenizer=tokenizer, max_input_length=args.max_seq_length, max_target_length=config_args.max_length) # TODO: max_len args화
+    prepro_fn = partial(tokenize_func, tokenizer=tokenizer, max_input_length=args.max_seq_length, max_target_length=config_args.max_target_length)
     tokenized_train_dataset = train_dataset.map(prepro_fn,
                                                 batched=True,
                                                 )
@@ -146,8 +146,8 @@ def train():
     # evaluation
     trainer.evaluate(
         eval_dataset=tokenized_eval_dataset,
-        max_length=64,
-        num_beams=4
+        max_length=config_args.max_target_length,
+        num_beams=config_args.num_beams
     )
 
 if __name__ == "__main__":
