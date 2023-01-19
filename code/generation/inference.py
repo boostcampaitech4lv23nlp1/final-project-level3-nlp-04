@@ -58,7 +58,7 @@ def main():
     model = get_model_func(config, args, config_args, tokenizer)
 
     # 데이터셋 전처리
-    prepro_fn = partial(tokenize_func, tokenizer=tokenizer, max_input_length=512, max_target_length=128)
+    prepro_fn = partial(tokenize_func, tokenizer=tokenizer, max_input_length=args.max_seq_length, max_target_length=config_args.max_target_length)
 
     tokenized_test_dataset = test_dataset.map(prepro_fn, batched=True, remove_columns=column_names) 
 
@@ -87,7 +87,7 @@ def main():
         predict_results = trainer.predict(
             tokenized_test_dataset,
             metric_key_prefix="predict", 
-            max_length=training_args.generation_max_length, 
+            max_length=config_args.max_target_length, 
             num_beams=config_args.num_beams
         )
 
