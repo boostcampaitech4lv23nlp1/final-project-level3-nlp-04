@@ -134,6 +134,7 @@ def informal_to_honorific(sentence, honorific_model):
     result = result.replace('오었다요', '왔어요')
     result = result.replace('오어요', '와요')
     result = result.replace('주어요', '줘요')
+    result = result.replace('좋다요', '좋아요')
     
     # 맞춤법 검사
     try:
@@ -143,19 +144,25 @@ def informal_to_honorific(sentence, honorific_model):
     print('###', result)
     return result
 
+def remove_useless_sentence(text):
+    text = str(text)
+    result = re.split(r'\n\n', text)[-1]
+    return result
 
 def split_sentence(text):
     return split_sentences(str(text))
 
-
 def honorific_transformation(text, honorific_model):
+    # GPT가 일기의 뒷내용을 이어서 생성한 부분은 삭제합니다.
+    text = remove_useless_sentence(text)
+
     results = []
     sentence_list = split_sentence(text)
     for sen in sentence_list:
         honorific_sen = informal_to_honorific(sen, honorific_model)
         results.append(honorific_sen)
     
-    return " ".join(results)
+    return " ".join(results).strip()
 
 model = Changer()
 # r = honorific_transformation("정말 재밌는 괌 여행이었구나! 여행을 가는 것만으로도 즐거움을 느낄 수 있는 거 같아요. 다음에는 더 재밌는 여행지로 가보는 건 어떨까요?", model)
@@ -218,6 +225,22 @@ model = Changer()
 # r = honorific_transformation("우와, 쿠키 수업이라니! 너무 즐거운 수업이었구나! 쿠키를 손으로 만들어 보니까 너무 재밌게 보였겠어. 맛도 맛있게 먹었구나. 다음에는 더 다양한 맛의 쿠키를 만들어 보는 건 어떨까? 꼭 다시 한번 만들어 보자!", model)
 # print(r)
 
+
+# txt = """
+#  나갔는지도 물어보고 나를 믿고 응원해주셔서 너무 감사했다. 
+
+# 좋은 꿈이었고, 오빠가 너무 소중하게 생각해주셔서 다시 한번 감사합니다! 그리고 오늘 알바를 잘 마치고 잘 쉬세요:)
+# """
+# r = honorific_transformation(txt, model)
+# print(r)
+
+# txt = """
+# 과 돌처럼 멈춰 있는 괴물 같은 느낌이 들었다. 시간이 길어지면 더욱 그렇게 느껴졌다. 그런데 대학에 들어오고 나서는 갑자기 그 물음표들이 하나하나 사라져갔다. 이제는 나만의 방향을 찾아가는 거리를 걸어가고 있다. 나는 이렇게 가는 거리를 믿고 있다.
+
+# 축하합니다! 대학생활은 새로운 방향을 찾아가는 길이라고 할 수 있습니다. 당신의 감정과 생각을 담은 글을 읽어서 많은 것을 느꼈습니다. 나만의 길을 걸어가는 것을 잊지 마시고, 물음표가 생길 때마다 당황하지 않고 해결해 나가는 방법을 찾아보는 것이 중요합니다. 가끔은 다른 사람들의 도움을 받아보기도 하면 좋을 것 같습니다. 그리고 인간관계는 학교에서 가장 중요한 요소입니다. 남들과의 관계를 가장 잘하는 것이 중요합니다. 그럼 잘 부탁드립니다!
+# """
+# r = honorific_transformation(txt, model)
+# print(r)
 
 if __name__ == "__main__":
     df_list = os.listdir("./csvs")
