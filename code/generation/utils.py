@@ -12,23 +12,23 @@ class KoreanRougeScorer(scoring.BaseScorer):
         self.rouge_types = rouge_types
         self.tokenizer = Mecab()
         
-    def score(self, target, prediction):
-        target_tokens = self.tokenizer.morphs(target)
-        prediction_tokens = self.tokenizer.morphs(prediction)
+    def score(self, references, predictions):
+        ref_tokens = self.tokenizer.morphs(references)
+        pred_tokens = self.tokenizer.morphs(predictions)
         result = {}
         
         for rouge_type in self.rouge_types:
             # ROUGE-L
             if rouge_type == "rougeL":
-                scores = score_lcs(target_tokens, prediction_tokens)
+                scores = score_lcs(ref_tokens, pred_tokens)
             # ROUGE-N
             elif re.match(r"rouge[0-9]$", six.ensure_str(rouge_type)):
                 n = int(rouge_type[5:]) # ex) rouge1 => 1
                 if n <= 0:
                     raise ValueError(f"rougen requires positive n: {rouge_type}")
-                target_ngrams = create_ngrams(target_tokens, n)
-                prediction_ngrams = create_ngrams(prediction_tokens, n)
-                scores = score_ngrams(target_ngrams, prediction_ngrams)
+                ref_ngrams = create_ngrams(ref_tokens, n)
+                pred_ngrams = create_ngrams(pred_tokens, n)
+                scores = score_ngrams(ref_ngrams, pred_ngrams)
             else:
                 raise ValueError(f"Invalid rouge type: {rouge_type}")
             result[rouge_type] = scores
