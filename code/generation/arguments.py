@@ -52,11 +52,11 @@ class ConfigArguments:
     Arguments for config setting
     """
 
-    min_length: int = field(
+    min_target_length: int = field(
         default=1
     )
 
-    max_length: int = field(
+    max_target_length: int = field(
         default=128
     )
 
