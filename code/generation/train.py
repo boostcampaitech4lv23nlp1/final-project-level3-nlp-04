@@ -28,7 +28,6 @@ from transformers.trainer_utils import get_last_checkpoint
 from arguments import *
 from utils import *
 from preprocessing import tokenize_func
-from get_model import get_model_func
 
 
 def train():
