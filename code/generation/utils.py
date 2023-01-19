@@ -2,6 +2,7 @@ import re
 import six
 import numpy as np
 from konlpy.tag import Mecab
+from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
 from rouge_score import scoring
 from rouge_utils import *
 
@@ -35,10 +36,34 @@ class KoreanRougeScorer(scoring.BaseScorer):
         return result
 
 
+def calc_corpus_bleu(predictions, references):
+    references = [[ref] for ref in references]
+    sf = SmoothingFunction(epsilon=1e-12).method1
+    b1 = corpus_bleu(references, predictions, weights=(1.0 / 1.0,), smoothing_function=sf)
+    b2 = corpus_bleu(references, predictions, weights=(1.0 / 2.0, 1.0 / 2.0), smoothing_function=sf)
+    b3 = corpus_bleu(references, predictions, weights=(1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0), smoothing_function=sf)
+    b4 = corpus_bleu(references, predictions, weights=(1.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0),
+                     smoothing_function=sf)
+    return b1, b2, b3, b4
+
+
+def bleu_score(predictions, references):
+    mecab = Mecab()
+    predictions = [mecab.morphs(pred) for pred in predictions]
+    references = [mecab.morphs(ref) for ref in references]
+    cbleu1, cbleu2, cbleu3, cbleu4 = calc_corpus_bleu(predictions, references)
+    matrix = {
+        'bleu1': cbleu1,
+        'bleu2': cbleu2,
+        'bleu3': cbleu3,
+        'bleu4': cbleu4,
+    }
+    return matrix
+
+
 def postprocess_text(preds, labels):
     preds = [pred.strip() for pred in preds]
     labels = [label.strip() for label in labels]
-
     return preds, labels
 
 
@@ -73,6 +98,26 @@ def compute_metrics(eval_pred, tokenizer):
     
     # median scores 추출
     result = {key: value.mid.fmeasure * 100 for key, value in result.items()}
+
+    # BLEU Score 
+    len_decoded_labels = len(decoded_labels)
+    bleu_score_list_1 = np.zeros(len_decoded_labels)
+    bleu_score_list_2 = np.zeros(len_decoded_labels)
+    bleu_score_list_3 = np.zeros(len_decoded_labels)
+    bleu_score_list_4 = np.zeros(len_decoded_labels)
+
+    for i in range(len_decoded_labels):
+        matrix = bleu_score([decoded_preds[i]], [decoded_labels[i]])
+        bleu_score_list_1[i] = matrix['bleu1']
+        bleu_score_list_2[i] = matrix['bleu2']
+        bleu_score_list_3[i] = matrix['bleu3']
+        bleu_score_list_4[i] = matrix['bleu4']
+        
+    result['bleu1'] = np.mean(bleu_score_list_1) * 100
+    result['bleu2'] = np.mean(bleu_score_list_2) * 100
+    result['bleu3'] = np.mean(bleu_score_list_3) * 100
+    result['bleu4'] = np.mean(bleu_score_list_4) * 100
+
     prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
     result["gen_len"] = np.mean(prediction_lens)
     result = {k: round(v, 4) for k, v in result.items()}
