@@ -23,7 +23,7 @@ from transformers import (
 )
 
 from transformers.optimization import AdamW, get_cosine_schedule_with_warmup
-
+from transformers.trainer_utils import get_last_checkpoint
 
 from arguments import *
 from utils import *
@@ -76,6 +76,7 @@ def train():
     tokenized_eval_dataset = eval_dataset.map(prepro_fn,
                                                 batched=True,
                                                 )
+                                                
     # collator의 입력 형식에 맞게 wrangling합니다.
     tokenized_train_dataset.remove_columns(train_dataset.column_names)
     tokenized_eval_dataset.remove_columns(eval_dataset.column_names)
@@ -99,8 +100,14 @@ def train():
         compute_metrics=metric_fn,
     )
 
-    # last checkpoint 찾기.
-    last_checkpoint = get_last_checkpoint(args, training_args)
+    # last checkpoint 찾기
+    last_checkpoint = None
+    if (
+        os.path.isdir(training_args.output_dir)
+        and training_args.do_train
+        and not training_args.overwrite_output_dir
+    ):
+        last_checkpoint = get_last_checkpoint(training_args.output_dir)
 
     # Training
     if last_checkpoint is not None:
@@ -125,7 +132,7 @@ def train():
     with open(output_train_file, "w") as writer:
         logger.info("***** Train results *****")
         for key, value in sorted(train_result.metrics.items()):
-            logger.info(f"  {key} = {value}")
+            logger.info(f"{key} = {value}")
             writer.write(f"{key} = {value}\n")
 
     # State 저장
