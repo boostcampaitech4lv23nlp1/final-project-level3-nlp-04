@@ -88,7 +88,17 @@ def inference():
     
     predict_df['predict'] = preds_labels
     predict_df['logits'] = logits
-    predict_df['probs'] = probs.tolist()
+    # predict_df['probs'] = probs.tolist()
+    
+    all_score_list = []
+    for i in probs.cpu().detach().numpy():
+        score = i
+        all_score = {model.config.id2label[label]: score[label]
+                     for label in model.config.id2label.keys()}
+        all_score = dict(
+            sorted(all_score.items(), key=lambda all_score: -all_score[1]))
+        all_score_list.append(all_score)
+    predict_df['all_score'] = all_score_list  
     
     if not os.path.exists(training_args.output_dir):
         os.mkdir(training_args.output_dir)

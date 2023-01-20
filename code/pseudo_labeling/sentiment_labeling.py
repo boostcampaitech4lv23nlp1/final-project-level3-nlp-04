@@ -35,7 +35,7 @@ class SentimentAnalysis():
 
         outputs = model_outputs["logits"][0]
         scores = F.softmax(outputs, dim=0).cpu().detach().numpy()
-
+        
         label = self.model.config.id2label[scores.argmax().item()]
         score = scores.max().item()
         all_score = {self.model.config.id2label[label]: scores[label]
