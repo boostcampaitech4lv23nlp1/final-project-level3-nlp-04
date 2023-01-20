@@ -2,9 +2,9 @@ from transformers import AutoModelForSeq2SeqLM
 
 def get_model_func(config, args, config_args, tokenizer):
 
-    config.eos_token_id = tokenizer.sep_token_id
-    config.pad_token_id = tokenizer.pad_token_id
-    config.forced_eos_token_id = tokenizer.eos_token_id
+    # config.eos_token_id = tokenizer.sep_token_id
+    # config.pad_token_id = tokenizer.pad_token_id
+    # config.forced_eos_token_id = tokenizer.eos_token_id
     config.min_length = config_args.min_target_length
     config.max_length = config_args.max_target_length
     config.no_repeat_ngram_size = config_args.no_repeat_ngram_size
