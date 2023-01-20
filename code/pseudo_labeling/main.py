@@ -4,7 +4,7 @@ from sentiment_labeling import SentimentAnalysis
 
 # 실행 방법
 # streamlit run main.py --server.port=30001
-preds = SentimentAnalysis("nlp04/korean_sentiment_analysis_dataset3")
+preds = SentimentAnalysis("JunHyung1206/kote_sentiment_roberta_large")
 
 st.title("Sentiment Analysis")
 if 'input' not in st.session_state:
@@ -20,12 +20,13 @@ with st.form(key="my_form"):
     submit = st.form_submit_button(label="click")
 
 if submit:
+    print(st.session_state['input'])
     label, score, all_score = preds.sentiment_analysis(
         st.session_state['input'])
     index = list(all_score.keys())
     values = [all_score[i] for i in index]
 
-    columns = st.columns([1, 1, 3])
+    columns = st.columns([1, 1, 2])
     for i in range(len(columns)):
         with columns[i]:
             st.write(f'{index[i]} : {all_score[index[i]]:.4f}')
