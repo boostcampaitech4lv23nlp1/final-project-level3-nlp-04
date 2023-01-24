@@ -194,8 +194,7 @@ model/save_models/
 SaveModels/
 model.pt
 output.csv
-
-
+models/
 
 
 *.yaml
