@@ -16,6 +16,8 @@ python train.py \
 --save_steps=1000 \
 --save_total_limit=3 \
 --predict_with_generate=True \
+--temperature 0.7 \
+--min_target_length 30 \
 --max_seq_length 512 \
 --max_target_length 128 \
 --load_best_model_at_end \
