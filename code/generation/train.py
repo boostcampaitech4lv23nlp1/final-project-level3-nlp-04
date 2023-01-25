@@ -63,8 +63,9 @@ def train():
     print("####### config: ", config)
 
     # 데이터셋
-    train_dataset = datasets.load_dataset('csv', data_files=args.train_data, split='train')
-    eval_dataset = datasets.load_dataset('csv', data_files=args.eval_data, split='train')
+    dataset = datasets.load_dataset("nlp04/diary_dataset")
+    train_dataset = dataset["train"]
+    eval_dataset = dataset["test"]
     train_dataset.shuffle(training_args.seed)
 
     # 데이터셋을 전처리합니다.
