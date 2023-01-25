@@ -112,11 +112,5 @@ def main():
                     result_df = pd.DataFrame(zip(decoded_labels, predictions), columns=['labels', 'preds'])
                     result_df.to_csv(os.path.join(training_args.output_dir, "generated_predictions.csv"), encoding='utf-8-sig')
 
-                else:
-                    # labels가 따로 없을 시 predictions 내용만 파일로 생성
-                    output_prediction_file = os.path.join(training_args.output_dir, "generated_predictions.txt")
-                    with open(output_prediction_file, "w") as writer:
-                        writer.write("\n".join(predictions))
-
 if __name__ == "__main__":
     main()
