@@ -43,7 +43,8 @@ def main():
     # 모델을 초기화하기 전에 난수를 고정합니다
     set_seed(training_args.seed)
 
-    test_dataset = datasets.load_dataset('csv', data_files=args.eval_data, split='train')
+    dataset = datasets.load_dataset("nlp04/diary_dataset")
+    test_dataset = dataset["test"]
     column_names = test_dataset.column_names
  
     # config, tokenizer, model
