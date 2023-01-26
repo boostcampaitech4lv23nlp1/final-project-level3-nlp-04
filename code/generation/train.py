@@ -54,6 +54,7 @@ def train():
     set_seed(training_args.seed)
 
     # config, tokenizer, model
+    # config = AutoConfig.from_pretrained(args.model_name_or_path)
     config = AutoConfig.from_pretrained(args.model_name_or_path)
 
     tokenizer = AutoTokenizer.from_pretrained(
@@ -61,6 +62,7 @@ def train():
 
     model = get_model_func(config, args, config_args, tokenizer)
     print("####### config: ", config)
+    print("####### model: ", model.config)
 
     # 데이터셋
     train_dataset = datasets.load_dataset('csv', data_files=args.train_data, split='train')
@@ -145,8 +147,13 @@ def train():
     # evaluation
     trainer.evaluate(
         eval_dataset=tokenized_eval_dataset,
+        min_length=config_args.min_target_length,
         max_length=config_args.max_target_length,
-        num_beams=config_args.num_beams
+        num_beams=config_args.num_beams,
+        temperature=config_args.temperature,
+        do_sample=config_args.do_sample,
+        top_k=config_args.top_k,
+        top_p=config_args.top_p
     )
 
 if __name__ == "__main__":
