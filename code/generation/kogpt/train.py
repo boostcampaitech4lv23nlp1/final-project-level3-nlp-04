@@ -86,6 +86,7 @@ def train():
         train_dataset=tokenized_train_dataset,
         eval_dataset=tokenized_eval_dataset,
         data_collator=data_collator,
+        tokenizer=tokenizer,
         compute_metrics=metric_fn,
         preprocess_logits_for_metrics=preprocess_logits_for_metrics,
     )
