@@ -1,6 +1,7 @@
 import re
 import six
 import numpy as np
+import torch
 from konlpy.tag import Mecab
 from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
 from rouge_score import scoring
@@ -82,7 +83,8 @@ def compute(predictions, references):
 
 
 def compute_metrics(eval_pred, tokenizer):
-    preds, labels = eval_pred
+    labels = eval_pred.label_ids
+    preds = eval_pred.predictions[0]
     
     # labels -100이면 교체
     labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
@@ -140,3 +142,12 @@ def get_model_func(config, args, config_args):
 
     model = GPT2LMHeadModel.from_pretrained(args.model_name_or_path, config=config)
     return model
+
+
+def preprocess_logits_for_metrics(logits, labels):
+    """
+    Original Trainer may have a memory leak. 
+    This is a workaround to avoid storing too many tensors that are not needed.
+    """
+    pred_ids = torch.argmax(logits[0], dim=-1)
+    return pred_ids, labels 
