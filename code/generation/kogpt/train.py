@@ -3,6 +3,7 @@ import torch
 import sys
 import wandb
 import logging
+from functools import partial
 
 from transformers import (
     AutoConfig,
@@ -44,28 +45,18 @@ def train():
     # 모델을 초기화하기 전에 난수를 고정합니다.
     set_seed(training_args.seed)
 
-    tokenizer = PreTrainedTokenizerFast.from_pretrained("skt/kogpt2-base-v2", 
-                                                        bos_token='</s>',
+    tokenizer = PreTrainedTokenizerFast.from_pretrained(args.model_name_or_path,
                                                         eos_token='</s>',
-                                                        unk_token='<unk>', 
-                                                        pad_token='<pad>', 
-                                                        mask_token='<mask>',
-                                                        max_length=args.max_seq_length,
+                                                        pad_token='</s>',
+                                                        truncation_side='left',
                                                         )
-    special_tokens_dict = {'additional_special_tokens':['<unused1>']}
-    tokenizer.add_special_tokens(special_tokens_dict)
-    tokenizer.save_pretrained(training_args.output_dir, legacy_format=False)
 
-    config = AutoConfig.from_pretrained('skt/kogpt2-base-v2', 
-                                        bos_token_id=tokenizer.bos_token_id,
+    config = AutoConfig.from_pretrained(args.model_name_or_path,
                                         eos_token_id=tokenizer.eos_token_id,
                                         pad_token_id=tokenizer.pad_token_id,
-                                        sep_token_id=tokenizer.sep_token_id,
-                                        unk_token_id=tokenizer.unk_token_id,
                                         )
 
     model = get_model_func(config, args, config_args)
-    model.resize_token_embeddings(len(tokenizer))
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model.to(device)
@@ -79,12 +70,16 @@ def train():
             mlm=False
         )
 
+    metric_fn = partial(compute_metrics, tokenizer=tokenizer)
+
     trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         data_collator=data_collator,
+        compute_metrics=metric_fn,
+        preprocess_logits_for_metrics=preprocess_logits_for_metrics,
     )
 
     # last checkpoint 찾기
