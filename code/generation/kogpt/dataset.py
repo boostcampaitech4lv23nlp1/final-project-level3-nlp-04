@@ -4,15 +4,15 @@ from torch.utils.data import Dataset
 
 
 class KoGPTDataset(Dataset):
-    def __init__(self, file_path, tokenizer, max_len):
+    def __init__(self, dataset, tokenizer, max_len):
         super().__init__()
         self.tok = tokenizer
         self.max_len = max_len
-        self.docs = pd.read_csv(file_path, encoding='utf-8')
-        self.len = self.docs.shape[0]
+        self.dataset = dataset
+        self.len = len(dataset)
     
     def __getitem__(self, idx):
-        instance = self.docs.iloc[idx]
+        instance = self.dataset[idx]
         context = instance['diary'] + self.tok.eos_token + instance['comment'] + self.tok.eos_token
 
         batch_encoding = self.tok(

@@ -4,6 +4,7 @@ import sys
 import wandb
 import logging
 from functools import partial
+import datasets
 
 from transformers import (
     AutoConfig,
@@ -62,8 +63,15 @@ def train():
     model.to(device)
 
     # 데이터셋
-    train_dataset = KoGPTDataset(args.train_data, tokenizer, max_len=args.max_seq_length)
-    eval_dataset = KoGPTDataset(args.eval_data, tokenizer, max_len=args.max_seq_length)
+    dataset = datasets.load_dataset("nlp04/diary_dataset")
+    train_dataset = dataset["train"]
+    eval_dataset = dataset["test"]
+    
+    train_dataset.shuffle(training_args.seed)
+    eval_dataset.shuffle(training_args.seed)
+
+    tokenized_train_dataset = KoGPTDataset(train_dataset, tokenizer, max_len=args.max_seq_length)
+    tokenized_eval_dataset = KoGPTDataset(eval_dataset, tokenizer, max_len=args.max_seq_length)
 
     data_collator = DataCollatorForLanguageModeling(
             tokenizer=tokenizer,
@@ -75,8 +83,8 @@ def train():
     trainer = Trainer(
         model=model,
         args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
+        train_dataset=tokenized_train_dataset,
+        eval_dataset=tokenized_eval_dataset,
         data_collator=data_collator,
         compute_metrics=metric_fn,
         preprocess_logits_for_metrics=preprocess_logits_for_metrics,
