@@ -55,40 +55,31 @@ st.markdown("""<style>
     justify-content: space-between;
 }
 
-.box_content{
-    font-size: 16px;
-    margin: 5px;
-}
-
-.text{
-    font-size: 18px;
-}
-
-.fade-in-title {
-    padding: 10px;
+.fade-out-title {
     font-family: 'Cafe24Shiningstar';
     text-align: center;
     font-size: 75px;
     color: #282828;
-    animation: fadein 3s;
-    -webkit-animation: fadein 3s; /* Safari and Chrome */
+    animation: fadeout 3s;
+    -webkit-animation: fadeout 3s; /* Safari and Chrome */
+    animation-fill-mode: forwards;
 }
 
-@keyframes fadein {
+@keyframes fadeout {
     from {
-        opacity: 0;
+        opacity: 1;
     }
     to {
-        opacity: 1;
+        opacity: 0;
     }
 }
 
-@-webkit-keyframes fadein { /* Safari and Chrome */
+@-webkit-keyframes fadeout { /* Safari and Chrome */
     from {
-        opacity: 0;
+        opacity: 1;
     }
     to {
-        opacity: 1;
+        opacity: 0;
     }
 }
 
@@ -96,6 +87,14 @@ st.markdown("""<style>
 .container{
     display: flex;
     flex-direction: row;
+    justify-content: center;
+    margin: 5px;
+    flex-wrap: nowrap;
+}
+
+.container_col{
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     margin: 5px;
     flex-wrap: nowrap;
@@ -173,7 +172,21 @@ set_png_as_page_bg('./background.jpeg', './moon.jpeg')
 
 
 ## setting title of project
-st.markdown('<p class="fade-in-title">오늘 하루는 어땠어요?</p>', unsafe_allow_html =True)
+st.markdown('''
+<div class="container">
+    <div class="title"> 너 </div>
+    <div class="fade-out-title"> 의 </div> 
+    <div class="title">&nbsp;&nbsp;하</div>
+    <div class="fade-out-title"> 루 </div>
+    <div class="fade-out-title"> 가 </div> 
+    <div class="title">&nbsp;궁</div>
+    <div class="fade-out-title"> 금 </div>
+    <div class="fade-out-title"> 해 </div> 
+    <div class="title"> &#127769; </div> 
+</div>
+''', unsafe_allow_html=True)
+
+
 st.markdown('<p class="subtitle">당신의 하루를 이야기해주세요.</p>', unsafe_allow_html=True)
 
 ## write diary
