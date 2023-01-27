@@ -9,7 +9,7 @@ from transformers import GPT2LMHeadModel
 from rouge_utils import *
 
 
-class KoreanRougeScorer(scoring.BaseScorer):
+class RougeScorer(scoring.BaseScorer):
     def __init__(self, rouge_types):
         self.rouge_types = rouge_types
         self.tokenizer = Mecab()
@@ -72,7 +72,7 @@ def postprocess_text(preds, labels):
 def compute(predictions, references):
     # ROUGE-N(unigram, bigram), ROUGE-L 측정
     rouge_types = ["rouge1", "rouge2", "rougeL"]
-    scorer = KoreanRougeScorer(rouge_types=rouge_types)
+    scorer = RougeScorer(rouge_types=rouge_types)
     aggregator = scoring.BootstrapAggregator()
     
     for ref, pred in zip(references, predictions):
@@ -129,11 +129,7 @@ def compute_metrics(eval_pred, tokenizer):
 
 
 def get_model_func(config, args, config_args):
-    # config.eos_token_id = tokenizer.sep_token_id
-    # config.pad_token_id = tokenizer.pad_token_id
-    # config.forced_eos_token_id = tokenizer.eos_token_id
-    config.min_length = config_args.min_target_length
-    config.max_length = config_args.max_target_length
+    config.min_length = config_args.min_length
     config.no_repeat_ngram_size = config_args.no_repeat_ngram_size
     config.early_stopping = config_args.early_stopping
     config.length_penalty = config_args.length_penalty
