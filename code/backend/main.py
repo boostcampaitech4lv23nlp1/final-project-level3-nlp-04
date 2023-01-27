@@ -79,9 +79,10 @@ def make_diary(diary_in: DiaryIn):
     diary_out = DiaryOut(
                   diary_content=diary_in.diary_content,
                   emotions=emotions,
-                  comment=comment)
+                  comment=comment,
+                  logits = all_scores_list)
     
-    diaries[diary_out.id] = diary_out.dict()
+    diaries[str(diary_out.id)] = diary_out.dict()
     
     return diary_out.dict()
 
