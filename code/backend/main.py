@@ -10,6 +10,8 @@ from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
 from datetime import datetime
 
+from config import CLF_MODEL_CKPT, CMT_MODEL_CKPT
+
 
 diaries = dict()
 
@@ -43,8 +45,8 @@ def load_models():
     global clf_model, cmt_model
     
     print("start loading model")
-    clf_model = SentimentAnalysis('JunHyung1206/kote_sentiment_roberta_large')
-    cmt_model = CommentGeneration('nlp04/kobart_8_5.6e-5_min30_lp4_sample')
+    clf_model = SentimentAnalysis(CLF_MODEL_CKPT)
+    cmt_model = CommentGeneration(CMT_MODEL_CKPT)
     
     print("successfully loaded!")
     
