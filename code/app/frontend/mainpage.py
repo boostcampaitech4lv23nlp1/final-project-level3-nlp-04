@@ -1,12 +1,8 @@
 import streamlit as st
-import webbrowser
 import base64
 import requests
 
-# html = open('./main.html', 'r', encoding='utf-8')
-# main_html = html.read()                  # return string type
-
-# 실행 방법
+# 서버에서의 streamlit 실행 방법
 # streamlit run mainpage.py --server.fileWatcherType none --server.port=30001
 
 
@@ -66,7 +62,6 @@ st.markdown("""<style>
 
 .text{
     font-size: 18px;
-
 }
 
 .fade-in-title {
@@ -174,7 +169,7 @@ def set_png_as_page_bg(jpeg_file, header_file):
     return
     
 
-set_png_as_page_bg('./background.jpeg', './Pencil_header2.jpeg')
+set_png_as_page_bg('./background.jpeg', './moon.jpeg')
 
 
 ## setting title of project
@@ -197,13 +192,18 @@ if writting_btn:
     emotions = response.json()["emotions"]
     comment = response.json()['comment']
     
-
-    # st.markdown('''<p class="typi"> 결과 </p>''', unsafe_allow_html=True)
     st.markdown(f'''
     <div class="container">
         <div class="emotion_box"> {emotions} </div>
         <div class="comment_box"> {comment} </div>
     </div>
     ''', unsafe_allow_html=True)
+
+    # st.markdown(f'''
+    # <div class="container">
+    #     <div class="emotion_box"> #좋아요 <br> #행복 </div>
+    #     <div class="comment_box"> 그동안 고생을 많이 했군요! 앞으로 당신에게 펼쳐질 미래를 응원해요. 다음에는 이렇게 해보는건 어떨까요? </div>
+    # </div>
+    # ''', unsafe_allow_html=True)
 
 
