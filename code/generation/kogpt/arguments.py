@@ -33,6 +33,18 @@ class Arguments:
         },
     )
 
+    top_k : int = field(
+        default=50,
+    )
+
+    top_p : float = field(
+        default=0.95,
+    )
+
+    temperature : float = field(
+        default=0.85
+    )
+
     wandb_project: str = field(
         default="None_project",
     )
@@ -51,13 +63,8 @@ class ConfigArguments:
     """
     Arguments for config setting
     """
-
-    min_target_length: int = field(
-        default=1
-    )
-
-    max_target_length: int = field(
-        default=128
+    min_length : int = field(
+        default=60
     )
 
     no_repeat_ngram_size: int = field(
