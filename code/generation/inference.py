@@ -66,7 +66,7 @@ def main():
         tokenizer, pad_to_multiple_of=8 if training_args.fp16 else None, model = model
     )
 
-    metric_fn = partial(compute_metrics, tokenizer=tokenizer)
+    metric_fn = partial(compute_metrics, tokenizer=tokenizer, inputs=tokenized_test_dataset['input_ids'])
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model.to(device)
@@ -111,7 +111,8 @@ def main():
                 if decoded_labels:
                     # decoded_labels(origin), predictions 비교를 위한 csv 생성
                     result_df = pd.DataFrame(zip(decoded_labels, predictions), columns=['labels', 'preds'])
-                    result_df.to_csv(os.path.join(training_args.output_dir, "generated_predictions.csv"), encoding='utf-8-sig')
+                    prefix = str(config_args.length_penalty) + '_' + str(config_args.min_target_length) + '_' +  str(config_args.temperature) + '_' + str(config_args.num_beams)
+                    result_df.to_csv(os.path.join(training_args.output_dir, prefix + "_generated_predictions.csv"), encoding='utf-8-sig')
 
 if __name__ == "__main__":
     main()
