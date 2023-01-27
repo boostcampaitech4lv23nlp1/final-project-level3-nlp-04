@@ -18,10 +18,10 @@ class DiaryIn(BaseModel):
     id: Optional[UUID] = Field(default_factory=uuid4)
     diary_content: str
 
+
 class DiaryOut(DiaryIn):
     emotions: List[str] = Field(default_factory=list)
     comment: Optional[str] = None
-    logits: Optional[Dict] = None
     created_at: datetime = Field(default_factory=datetime.now)
 
 
@@ -79,8 +79,7 @@ def make_diary(diary_in: DiaryIn):
     diary_out = DiaryOut(
                   diary_content=diary_in.diary_content,
                   emotions=emotions,
-                  comment=comment,
-                  logits = all_scores_list)
+                  comment=comment)
     
     diaries[str(diary_out.id)] = diary_out.dict()
     
@@ -89,12 +88,7 @@ def make_diary(diary_in: DiaryIn):
 
 @app.on_event("shutdown")
 def save_diaries():
-    import json
-    
-    file_path = './log/' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f') + '.json'
-    
-    with open(file_path, 'w') as outfile:
-        json.dump(diaries, outfile)
+    return 0
        
     
 
