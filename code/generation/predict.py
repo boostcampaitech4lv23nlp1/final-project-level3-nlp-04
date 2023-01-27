@@ -1,5 +1,5 @@
 import torch
-import streamlit as st
+# import streamlit as st
 from transformers import (
     AutoTokenizer,
     AutoModelForSeq2SeqLM,
@@ -12,7 +12,7 @@ spacer = Spacer()
 
 # 맞춤법을 교정합니다.
 
-@st.cache(allow_output_mutation=True)
+# @st.cache(allow_output_mutation=True)
 class CommentGeneration():
     def __init__(self, ckpt_name):
         self.ckpt_name = ckpt_name

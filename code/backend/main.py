@@ -3,22 +3,27 @@ from uuid import UUID, uuid4
 import uvicorn
 from fastapi import FastAPI
 
+
 # import config
 
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional, List, Dict
 from datetime import datetime
 
 
-diaries = []
+diaries = dict()
 
 
-class Diary(BaseModel):
-    id: UUID = Field(default_factory=uuid4)
+class DiaryIn(BaseModel):
+    id: Optional[UUID] = Field(default_factory=uuid4)
     diary_content: str
+
+class DiaryOut(DiaryIn):
     emotions: List[str] = Field(default_factory=list)
     comment: Optional[str] = None
+    logits: Optional[Dict] = None
     created_at: datetime = Field(default_factory=datetime.now)
+
 
 
 
@@ -39,7 +44,7 @@ def load_models():
     
     print("start loading model")
     clf_model = SentimentAnalysis('JunHyung1206/kote_sentiment_roberta_large')
-    cmt_model = CommentGeneration('lcw99/t5-base-korean-paraphrase')
+    cmt_model = CommentGeneration('nlp04/kobart_8_5.6e-5_min30_lp4_sample')
     
     print("successfully loaded!")
     
@@ -50,9 +55,9 @@ def read_root():
     return {"message": "FastAPI"}
 
 @app.post("/diary", description="일기작성")
-def make_diary(diary_content: str):
+def make_diary(diary_in: DiaryIn):
     
-    _, _, all_scores = clf_model.sentiment_analysis(diary_content)
+    _, _, all_scores = clf_model.sentiment_analysis(diary_in.diary_content)
     
     all_scores_list = [(emotion, all_scores[emotion]) for emotion in all_scores.keys()]
     all_scores_list.sort(key=lambda x: x[1], reverse=True)
@@ -68,37 +73,27 @@ def make_diary(diary_content: str):
     if top1_logit * 0.9 <= top2_logit:
         emotions.append(top2)
     
-    comment = cmt_model.comment_generation(diary_content)
+    comment = cmt_model.comment_generation(diary_in.diary_content)
     
     
-    diary = Diary(diary_content=diary_content,
+    diary_out = DiaryOut(
+                  diary_content=diary_in.diary_content,
                   emotions=emotions,
                   comment=comment)
     
+    diaries[diary_out.id] = diary_out.dict()
     
-    diaries.append(diary)
-    
-    
-    return {'diary': diary_content,
-            'emotion': ",".join(emotions),
-            'comment': comment,
-            'created_at': diary.created_at.strftime('%Y-%m-%d-%H-%M-%S-%f')}
+    return diary_out.dict()
 
 
 @app.on_event("shutdown")
 def save_diaries():
-    import pandas as pd
+    import json
     
-    save_df = pd.DataFrame(columns=['id', 'diary', 'emotion', 'comment', 'created_at'])
+    file_path = './log/' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f') + '.json'
     
-    for diary in diaries:
-        save_df = save_df.append({'id': diary.id,
-                        'diary': diary.diary_content,
-                        'emotion': ", ".join(diary.emotions),
-                        'comment': diary.comment,
-                        'created_at': diary.created_at.strftime('%Y-%m-%d-%H-%M-%S-%f')}, ignore_index=True)
-    
-    save_df.to_csv('./log/' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f') + '.csv', index=False)
+    with open(file_path, 'w') as outfile:
+        json.dump(diaries, outfile)
        
     
 
