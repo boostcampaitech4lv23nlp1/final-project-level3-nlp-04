@@ -38,11 +38,11 @@ class Arguments:
     )
 
     top_p : float = field(
-        default=0.95,
+        default=0.92,
     )
 
     temperature : float = field(
-        default=0.85
+        default=0.9,
     )
 
     wandb_project: str = field(
