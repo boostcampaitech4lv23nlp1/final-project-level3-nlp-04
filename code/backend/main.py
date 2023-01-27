@@ -85,7 +85,7 @@ def make_diary(diary_in: DiaryIn):
     
     diaries[str(diary_out.id)] = diary_out.dict()
     
-    return diary_out.dict()
+    return {'emotions': ",".join(emotions), 'comment': comment}
 
 
 @app.on_event("shutdown")
