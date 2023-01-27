@@ -18,7 +18,7 @@ do
     --weight_decay 0.01 \
     --warmup_ratio 0.1 \
     --learning_rate ${lr} \
-    --eval_steps 1000 \
+    --eval_steps 5000 \
     --logging_steps 100 \
     --save_steps=10000 \
     --save_total_limit=1 \
