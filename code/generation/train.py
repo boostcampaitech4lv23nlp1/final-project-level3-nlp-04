@@ -65,7 +65,7 @@ def train():
     print("####### model: ", model.config)
 
     # 데이터셋
-    dataset = datasets.load_dataset("nlp04/diary_dataset")
+    dataset = datasets.load_dataset("nlp04/preprocessed_diary_dataset")
     train_dataset = dataset["train"]
     eval_dataset = dataset["test"]
     train_dataset.shuffle(training_args.seed)
