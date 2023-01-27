@@ -1,6 +1,7 @@
 import streamlit as st
 import webbrowser
 import base64
+import requests
 
 # html = open('./main.html', 'r', encoding='utf-8')
 # main_html = html.read()                  # return string type
@@ -188,6 +189,10 @@ user_diary = {'content': diary}
 
 
 if writting_btn:
+    response = requests.post(url='', json = user_diary)
+    emotions = eval(response.text)
+    
+
     # st.markdown('''<p class="typi"> 결과 </p>''', unsafe_allow_html=True)
     st.markdown(f'''
     <div class="container">
