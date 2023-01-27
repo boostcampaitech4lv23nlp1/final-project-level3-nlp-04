@@ -6,6 +6,8 @@ import requests
 # html = open('./main.html', 'r', encoding='utf-8')
 # main_html = html.read()                  # return string type
 
+# 실행 방법
+# streamlit run mainpage.py --server.fileWatcherType none --server.port=30001
 
 
 st.markdown("""<style>
