@@ -21,7 +21,55 @@ total_dataset = train_dataset + validation_dataset
 def sentence_split(sentences):
     sentences = list(
         filter(lambda x: x, [i.strip() for i in re.split(r'([.?!])', sentences)]))
-    respon = ["응.", "맞아.", "고마워.", "그래.", "아니.", "그렇군요."]
+    respon = [
+        "응.", "맞아.", "고마워.", "그래.", "아니.",
+        "응 맞아.", "응 많이.", "아니야.", "그런가.", "그런가?",
+        "그렇긴 하지.", "그런 것 같아.", "그러네.", "아니 그건 아니야.", "아니 없을 거야.",
+        "아.", "그렇군요.", "그러시군요.", "그랬군요.", "네 그러시군요.",
+        "네.", "그러셨군요.", "아하.", "그러네요.", "그러니까 말이야.",
+        "그러게나 말이야.", "그러게 말이야.", "그랬군요.", "모르겠어.", "네 그러셨군요.",
+        "그런가 봐.", "응 고마워.", "어.", "정말.", "그렇지.",
+        "그럼요.", "그치.", "그래요.", "몰라.", "좋아요.",
+        "그러려나.", "웅.", "글쎄.", "없어.", "좋아.",
+        "맞다.", "아니 없어.", "좋지.", "그럼.", "네?",
+        "고마워!", "고마워.", "좋은 생각이에요.", "좋은 생각이에요!", "정말 좋은 생각이에요!"
+    ]
+
+    more_infomation = [
+        "말씀해주세요",
+        "말씀해 주세요",
+        "자세히 말씀",
+        "자세히 얘기",
+        "조금 자세히",
+        "자세히 이야기",
+        "자세히 알려",
+        "자세히 말해",
+        "자세히 듣고",
+        "더 자세하게",
+        "자세한 이야기",
+        "보다 더 자세히",
+        "더 자세히 들려주세요.",
+        "더 자세한 설명",
+        "더 자세히 설명",
+        "상세히 설명",
+        "자세히 설명해주",
+        "무슨 일 있으셨어요?",
+        "무슨 일 있으세요?",
+        "무슨 일이 있나",
+        "무슨일이 있으신가요?",
+        "무슨일 있으세요?",
+        "무슨일이세요?",
+        "무슨일 있으신가요?",
+        "무슨일있으세요?",
+        "무슨일 있으셨어요?",
+        "무슨일이 있으셨나요?",
+        "무슨일이신가요?",
+        "무슨일이 있으셨어요?",
+        "무슨 일 있으셨나요?",
+        "무슨 일 있으신가요?",
+        "무슨 일 있으신가요?",
+        "무슨 일이신가요?"
+    ]
     is_question = False
     result = []
     if sentences:
@@ -37,11 +85,28 @@ def sentence_split(sentences):
                 temp += sentences[i]
 
                 if i+1 < len(sentences) and sentences[i+1] not in punct:
-                    if temp not in respon:
-                        result.append(temp)
+                    if temp.strip() not in respon:
+                        flag = True
+                        for j in more_infomation:
+                            flag = flag and j not in temp.strip()
+                        if flag:
+                            result.append(temp)
+                        # else:
+                        #     print(temp)
+                    # else:
+                    #     print(temp)
                     temp = ""
             i += 1
-        result.append(temp)
+        if temp.strip() not in respon:
+            flag = True
+            for j in more_infomation:
+                flag = flag and j not in temp.strip()
+            if flag:
+                result.append(temp)
+            # else:
+            #     print(temp)
+        # else:
+        #     print(temp)
     return result, is_question
 
 
@@ -104,4 +169,4 @@ df = pd.DataFrame({'id': id, 'diary': diary, 'comment': comment,
 df = df.dropna(axis=0, how='any')
 df = df.sort_values(by=['id'])
 
-df.to_csv(f'{root_path}aihub_감성대화.csv', encoding="utf8", index=False)
+df.to_csv(f'{root_path}aihub_감성대화_수정2.csv', encoding="utf8", index=False)
