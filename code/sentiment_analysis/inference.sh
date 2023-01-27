@@ -1,9 +1,8 @@
 python inference.py \
 --output_dir ./models/train_dataset \
 --fp16 \
---overwrite_output_dir \
---eval_data './data/kote_all - emotion_ver1_test.csv' \
---model_name_or_path ./models/train_dataset \
+--eval_data './data/비출판물 말뭉치_정제.csv' \
+--model_name_or_path nlp04/korean_sentiment_analysis_kcelectra \
 --per_device_train_batch_size 32 \
 --per_device_eval_batch_size 32 \
 --gradient_accumulation_steps 4 \
