@@ -48,22 +48,26 @@ def train():
 
     tokenizer = PreTrainedTokenizerFast.from_pretrained(args.model_name_or_path,
                                                         eos_token='</s>',
-                                                        pad_token='</s>',
-                                                        truncation_side='left',
+                                                        pad_token='<pad>',
+                                                        unk_token='<unk>',
+                                                        sep_token='<sep>',
                                                         )
 
     config = AutoConfig.from_pretrained(args.model_name_or_path,
                                         eos_token_id=tokenizer.eos_token_id,
                                         pad_token_id=tokenizer.pad_token_id,
+                                        unk_token_id=tokenizer.unk_token_id,
+                                        sep_token_id=tokenizer.sep_token_id,
                                         )
 
     model = get_model_func(config, args, config_args)
+    model.resize_token_embeddings(len(tokenizer))
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model.to(device)
 
     # 데이터셋
-    dataset = datasets.load_dataset("nlp04/diary_dataset")
+    dataset = datasets.load_dataset("nlp04/preprocessed_diary_dataset")
     train_dataset = dataset["train"]
     eval_dataset = dataset["test"]
     
