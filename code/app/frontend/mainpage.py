@@ -185,19 +185,22 @@ _, col, _ = st.columns([2.2]*2+[1.18])
 writting_btn = col.button("나의 하루 보내기")
 
 
-user_diary = {'content': diary}
+user_diary = {'diary_content': diary}
 
 
 if writting_btn:
-    response = requests.post(url='', json = user_diary)
-    emotions = eval(response.text)
+    
+    response = requests.post("http://localhost:8080/diary", json=user_diary)
+    
+    emotions = response.json()["emotions"]
+    comment = response.json()['comment']
     
 
     # st.markdown('''<p class="typi"> 결과 </p>''', unsafe_allow_html=True)
     st.markdown(f'''
     <div class="container">
-        <div class="emotion_box"> #좋아요 <br> #행복 </div>
-        <div class="comment_box"> 그동안 고생을 많이 했군요! 앞으로 당신에게 펼쳐질 미래를 응원해요. 다음에는 이렇게 해보는건 어떨까요? </div>
+        <div class="emotion_box"> {emotions} </div>
+        <div class="comment_box"> {comment} </div>
     </div>
     ''', unsafe_allow_html=True)
 
