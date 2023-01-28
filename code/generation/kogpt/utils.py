@@ -6,6 +6,8 @@ from konlpy.tag import Mecab
 from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
 from rouge_score import scoring
 from transformers import GPT2LMHeadModel
+from sentence_transformers import SentenceTransformer 
+from sklearn.metrics.pairwise import cosine_similarity
 from rouge_utils import *
 
 
@@ -63,6 +65,22 @@ def bleu_score(predictions, references):
     return matrix
 
 
+def rdass_score(inputs, predictions, references):
+    model = SentenceTransformer('snunlp/KR-SBERT-V40K-klueNLI-augSTS')
+
+    V_d = model.encode(inputs)
+    V_r = model.encode(references)
+    V_p = model.encode(predictions)
+
+    s_pr = cosine_similarity(V_p, V_r)
+    s_pd = cosine_similarity(V_p, V_d)
+
+    RDASS = (s_pr + s_pd) / 2
+    RDASS_mean = RDASS.diagonal().mean()
+
+    return RDASS_mean
+
+
 def postprocess_text(preds, labels):
     preds = [pred.strip() for pred in preds]
     labels = [label.strip() for label in labels]
@@ -82,35 +100,25 @@ def compute(predictions, references):
     return result
 
 
-def compute_metrics(eval_pred, tokenizer):
-    labels = eval_pred.label_ids
-    preds = eval_pred.predictions[0]
-    
-    # labels -100이면 교체
-    labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
-    
-    # 텍스트로 디코딩
-    decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-    decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-    
+def compute_metrics(diary, preds, labels, tokenizer):
     # post-processing
-    decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
+    preds, labels = postprocess_text(preds, labels)
     
     # ROUGE score 계산
-    result = compute(predictions=decoded_preds, references=decoded_labels)
+    result = compute(predictions=preds, references=labels)
     
     # median scores 추출
     result = {key: value.mid.fmeasure * 100 for key, value in result.items()}
 
     # BLEU Score 
-    len_decoded_labels = len(decoded_labels)
+    len_decoded_labels = len(labels)
     bleu_score_list_1 = np.zeros(len_decoded_labels)
     bleu_score_list_2 = np.zeros(len_decoded_labels)
     bleu_score_list_3 = np.zeros(len_decoded_labels)
     bleu_score_list_4 = np.zeros(len_decoded_labels)
 
     for i in range(len_decoded_labels):
-        matrix = bleu_score([decoded_preds[i]], [decoded_labels[i]])
+        matrix = bleu_score([preds[i]], [labels[i]])
         bleu_score_list_1[i] = matrix['bleu1']
         bleu_score_list_2[i] = matrix['bleu2']
         bleu_score_list_3[i] = matrix['bleu3']
@@ -121,7 +129,10 @@ def compute_metrics(eval_pred, tokenizer):
     result['bleu3'] = np.mean(bleu_score_list_3) * 100
     result['bleu4'] = np.mean(bleu_score_list_4) * 100
 
-    prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
+    #RDASS score 계산
+    result['rdass'] = rdass_score(diary, preds, labels)
+
+    prediction_lens = [len(tokenizer.encode(pred)) for pred in preds]
     result["gen_len"] = np.mean(prediction_lens)
     result = {k: round(v, 4) for k, v in result.items()}
     
