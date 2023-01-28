@@ -72,7 +72,13 @@ def inference():
         outputs.append(output.replace('</s>', ''))
 
     result_df = pd.DataFrame(zip(eval_dataset['diary'], eval_dataset['comment'], outputs), columns=['diary', 'labels', 'preds'])
-    result_df.to_csv(os.path.join(training_args.output_dir, "generated_predictions.csv"), encoding='utf-8-sig')
+
+    metrics = compute_metrics(result_df['diary'].tolist(), result_df['preds'].tolist(), result_df['labels'].tolist(), tokenizer)
+    print('***** Metrics *****')
+    print(metrics)
+
+    prefix = str(config_args.length_penalty) + '_' + str(config_args.min_length) + '_' +  str(args.temperature) + '_' + str(config_args.num_beams)
+    result_df.to_csv(os.path.join(training_args.output_dir, prefix + "_generated_predictions.csv"), encoding='utf-8-sig')
 
 
 if __name__ == '__main__':
