@@ -3,7 +3,6 @@ import torch
 import sys
 import wandb
 import logging
-from functools import partial
 import datasets
 
 from transformers import (
@@ -82,8 +81,6 @@ def train():
             mlm=False
         )
 
-    metric_fn = partial(compute_metrics, tokenizer=tokenizer)
-
     trainer = Trainer(
         model=model,
         args=training_args,
@@ -91,8 +88,6 @@ def train():
         eval_dataset=tokenized_eval_dataset,
         data_collator=data_collator,
         tokenizer=tokenizer,
-        compute_metrics=metric_fn,
-        preprocess_logits_for_metrics=preprocess_logits_for_metrics,
     )
 
     # last checkpoint 찾기
