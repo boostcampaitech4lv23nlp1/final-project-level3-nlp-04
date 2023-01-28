@@ -38,14 +38,26 @@ class CommentGeneration():
         inputs = self.spell_check_and_spacing([text])
         inputs = self.tokenizer(inputs, max_length=self.max_length, return_tensors='pt', truncation=True).to(self.device)
         input_ids = inputs["input_ids"]
-        model_outputs = self.model.generate(input_ids, eos_token_id=self.tokenizer.eos_token_id, max_length=self.max_target_length, min_length = 60, num_beams=5,temperature=0.7)
+        model_outputs = self.model.generate(input_ids, eos_token_id=self.tokenizer.eos_token_id, 
+                                            max_length=self.max_target_length, 
+                                            min_length = 30, 
+                                            num_beams=5, 
+                                            do_sample=True,
+                                            temperature=1.0,
+                                            top_k=30,
+                                            top_p=0.92,
+                                            length_penalty=0.5,
+                                            )
         comment = self.tokenizer.decode(model_outputs[0],skip_special_tokens=True)
+
+        # comment에 대해 맞춤법, 띄어쓰기 교정을 수행합니다.
+        comment = self.spell_check_and_spacing([comment])
         #print(comment)
         return comment
     
     def spell_check_and_spacing(self, array):
         # 띄어쓰기를 교정합니다.
-        array = spacer.space(array, batch_size=64)
+        array = spacer.space(array)
         
         # 맞춤법을 교정합니다.
         array = self.spell_check(array)
@@ -62,7 +74,7 @@ class CommentGeneration():
         return spell_checked
 
 if __name__ == '__main__':
-    preds = CommentGeneration("./models/total_comment_emotion")
+    preds = CommentGeneration("nlp04/final_bart")
     sentence = input('문장 입력 : ')
     while (sentence != ''):
         preds.comment_generation(sentence)
