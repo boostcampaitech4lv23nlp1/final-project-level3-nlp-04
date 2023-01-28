@@ -57,7 +57,7 @@ class CommentGeneration():
         comment = self.tokenizer.decode(model_outputs[0],skip_special_tokens=True)
 
         # comment에 대해 맞춤법, 띄어쓰기 교정을 수행합니다.
-        comment = self.spell_check_and_spacing([comment])
+        comment = self.spell_check_and_spacing([comment])[0]
         #print(comment)
         
         while err_char.search(comment):
