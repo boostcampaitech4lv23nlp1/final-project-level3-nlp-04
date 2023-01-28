@@ -3,7 +3,7 @@ from tqdm import tqdm
 import pandas as pd
 
 # put your api key
-openai.api_key = "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"
+openai.api_key = ""
 model_engine = "text-davinci-003"
 # put your data path
 path = '../dataset/extra_diary.csv'
