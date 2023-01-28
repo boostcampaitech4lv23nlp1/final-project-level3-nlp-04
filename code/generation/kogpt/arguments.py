@@ -64,7 +64,7 @@ class ConfigArguments:
     Arguments for config setting
     """
     min_length : int = field(
-        default=60
+        default=30
     )
 
     no_repeat_ngram_size: int = field(
@@ -76,7 +76,7 @@ class ConfigArguments:
     )
 
     length_penalty: float = field(
-        default=0.0
+        default=5.0
     )
 
     num_labels: int = field(
@@ -84,5 +84,5 @@ class ConfigArguments:
     )
 
     num_beams: int = field(
-        default=4
+        default=5
     )
