@@ -1,12 +1,8 @@
 import streamlit as st
-import webbrowser
 import base64
 import requests
 
-# html = open('./main.html', 'r', encoding='utf-8')
-# main_html = html.read()                  # return string type
-
-# 실행 방법
+# 서버에서의 streamlit 실행 방법
 # streamlit run mainpage.py --server.fileWatcherType none --server.port=30001
 
 
@@ -59,41 +55,31 @@ st.markdown("""<style>
     justify-content: space-between;
 }
 
-.box_content{
-    font-size: 16px;
-    margin: 5px;
-}
-
-.text{
-    font-size: 18px;
-
-}
-
-.fade-in-title {
-    padding: 10px;
+.fade-out-title {
     font-family: 'Cafe24Shiningstar';
     text-align: center;
     font-size: 75px;
     color: #282828;
-    animation: fadein 3s;
-    -webkit-animation: fadein 3s; /* Safari and Chrome */
+    animation: fadeout 3s;
+    -webkit-animation: fadeout 3s; /* Safari and Chrome */
+    animation-fill-mode: forwards;
 }
 
-@keyframes fadein {
+@keyframes fadeout {
     from {
-        opacity: 0;
+        opacity: 1;
     }
     to {
-        opacity: 1;
+        opacity: 0;
     }
 }
 
-@-webkit-keyframes fadein { /* Safari and Chrome */
+@-webkit-keyframes fadeout { /* Safari and Chrome */
     from {
-        opacity: 0;
+        opacity: 1;
     }
     to {
-        opacity: 1;
+        opacity: 0;
     }
 }
 
@@ -101,6 +87,14 @@ st.markdown("""<style>
 .container{
     display: flex;
     flex-direction: row;
+    justify-content: center;
+    margin: 5px;
+    flex-wrap: nowrap;
+}
+
+.container_col{
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     margin: 5px;
     flex-wrap: nowrap;
@@ -174,11 +168,25 @@ def set_png_as_page_bg(jpeg_file, header_file):
     return
     
 
-set_png_as_page_bg('./background.jpeg', './Pencil_header2.jpeg')
+set_png_as_page_bg('./background.jpeg', './moon.jpeg')
 
 
 ## setting title of project
-st.markdown('<p class="fade-in-title">오늘 하루는 어땠어요?</p>', unsafe_allow_html =True)
+st.markdown('''
+<div class="container">
+    <div class="title"> 너 </div>
+    <div class="fade-out-title"> 의 </div> 
+    <div class="title">&nbsp;&nbsp;하</div>
+    <div class="fade-out-title"> 루 </div>
+    <div class="fade-out-title"> 가 </div> 
+    <div class="title">&nbsp;궁</div>
+    <div class="fade-out-title"> 금 </div>
+    <div class="fade-out-title"> 해 </div> 
+    <div class="title"> &#127769; </div> 
+</div>
+''', unsafe_allow_html=True)
+
+
 st.markdown('<p class="subtitle">당신의 하루를 이야기해주세요.</p>', unsafe_allow_html=True)
 
 ## write diary
@@ -197,13 +205,18 @@ if writting_btn:
     emotions = response.json()["emotions"]
     comment = response.json()['comment']
     
-
-    # st.markdown('''<p class="typi"> 결과 </p>''', unsafe_allow_html=True)
     st.markdown(f'''
     <div class="container">
         <div class="emotion_box"> {emotions} </div>
         <div class="comment_box"> {comment} </div>
     </div>
     ''', unsafe_allow_html=True)
+
+    # st.markdown(f'''
+    # <div class="container">
+    #     <div class="emotion_box"> #좋아요 <br> #행복 </div>
+    #     <div class="comment_box"> 그동안 고생을 많이 했군요! 앞으로 당신에게 펼쳐질 미래를 응원해요. 다음에는 이렇게 해보는건 어떨까요? </div>
+    # </div>
+    # ''', unsafe_allow_html=True)
 
 
