@@ -64,7 +64,7 @@ class ConfigArguments:
     Arguments for config setting
     """
     min_length : int = field(
-        default=30
+        default=35
     )
 
     no_repeat_ngram_size: int = field(

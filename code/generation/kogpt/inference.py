@@ -5,6 +5,7 @@ import logging
 import datasets
 import pandas as pd
 from tqdm import tqdm
+import json
 
 from transformers import (
     AutoConfig,
@@ -78,7 +79,13 @@ def inference():
     print(metrics)
 
     prefix = str(config_args.length_penalty) + '_' + str(config_args.min_length) + '_' +  str(args.temperature) + '_' + str(config_args.num_beams)
+    # comment 생성 결과 저장
     result_df.to_csv(os.path.join(training_args.output_dir, prefix + "_generated_predictions.csv"), encoding='utf-8-sig')
+
+    # metrics 저장
+    metrics = {k:float(v) for k, v in metrics.items()}
+    with open(os.path.join(training_args.output_dir, prefix + '_predict_results.json'), 'w') as f:
+         json.dump(metrics, f, indent=4)
 
 
 if __name__ == '__main__':
