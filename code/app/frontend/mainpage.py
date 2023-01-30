@@ -1,6 +1,7 @@
 import streamlit as st
 import base64
 import requests
+from configs import emotion_day
 
 # 서버에서의 streamlit 실행 방법
 # streamlit run mainpage.py --server.fileWatcherType none --server.port=30001
@@ -203,7 +204,7 @@ st.markdown('''
 st.markdown('<p class="subtitle">당신의 하루를 이야기해주세요.</p>', unsafe_allow_html=True)
 
 ## write diary
-diary = st.text_area(label='Please put your diary', key='diary_key', height=270, max_chars=700, label_visibility="hidden")
+diary = st.text_area(label='Please put your diary', key='diary_key', height=270, label_visibility="hidden")
 _, col, _ = st.columns([2.2]*2+[1.18])
 writting_btn = col.button("나의 하루 보내기")
 
@@ -227,9 +228,9 @@ if writting_btn:
 
     ## 감정은 최대 top 2까지 출력되므로
     if len(emotions) == 2:
-        str_emotions = '#'+emotions[0]+'\n'+'#'+emotions[1]
+        str_emotions = emotion_day[emotions[0]]+'\n'+emotion_day[emotions[1]]
     else:
-        str_emotions = '#'+emotions[0]
+        str_emotions = emotion_day[emotions[0]]
 
 
     st.markdown(f"""
