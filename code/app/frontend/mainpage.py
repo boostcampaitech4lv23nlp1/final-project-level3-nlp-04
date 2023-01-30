@@ -7,16 +7,7 @@ import requests
 
 
 st.markdown("""<style>
-@import url('https://fonts.googleapis.com/css?family=Jua&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Gowun+Dodum&display=swap');
-
-@font-face {
-    font-family: 'BMDoHyeon';
-    font-weight: normal; 
-    font-style: normal; 
-    src: url(https://cdn.jsdelivr.net/gh/webfontworld/woowahan/BMDoHyeon.woff2) format('woff2');
-    font-display: swap;
-}
 
 @font-face {
     font-family: 'Cafe24Shiningstar';
@@ -105,14 +96,6 @@ st.markdown("""<style>
 .container{
     display: flex;
     flex-direction: row;
-    justify-content: center;
-    margin: 5px;
-    flex-wrap: nowrap;
-}
-
-.container_col{
-    display: flex;
-    flex-direction: column;
     justify-content: center;
     margin: 5px;
     flex-wrap: nowrap;
@@ -241,10 +224,6 @@ if writting_btn:
     
     emotions = response.json()["emotions"]
     comment = response.json()['comment']
-    
-    print(f'emotions: {emotions}')
-    print(f'comment: {comment}')
-    # emotions.append('즐거운(너무 신이나는)')
 
     ## 감정은 최대 top 2까지 출력되므로
     if len(emotions) == 2:
@@ -259,5 +238,3 @@ if writting_btn:
         <div class="comment_box"> {comment} </div>
     </div>
     """, unsafe_allow_html=True)
-
-
