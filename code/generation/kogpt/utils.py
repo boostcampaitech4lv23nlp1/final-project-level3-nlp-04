@@ -1,14 +1,17 @@
 import re
 import six
 import numpy as np
+import torch
 from konlpy.tag import Mecab
 from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
 from rouge_score import scoring
-from transformers import AutoModelForSeq2SeqLM
+from transformers import GPT2LMHeadModel
+from sentence_transformers import SentenceTransformer 
+from sklearn.metrics.pairwise import cosine_similarity
 from rouge_utils import *
 
 
-class KoreanRougeScorer(scoring.BaseScorer):
+class RougeScorer(scoring.BaseScorer):
     def __init__(self, rouge_types):
         self.rouge_types = rouge_types
         self.tokenizer = Mecab()
@@ -62,6 +65,22 @@ def bleu_score(predictions, references):
     return matrix
 
 
+def rdass_score(inputs, predictions, references):
+    model = SentenceTransformer('snunlp/KR-SBERT-V40K-klueNLI-augSTS')
+
+    V_d = model.encode(inputs)
+    V_r = model.encode(references)
+    V_p = model.encode(predictions)
+
+    s_pr = cosine_similarity(V_p, V_r)
+    s_pd = cosine_similarity(V_p, V_d)
+
+    RDASS = (s_pr + s_pd) / 2
+    RDASS_mean = RDASS.diagonal().mean()
+
+    return RDASS_mean
+
+
 def postprocess_text(preds, labels):
     preds = [pred.strip() for pred in preds]
     labels = [label.strip() for label in labels]
@@ -71,7 +90,7 @@ def postprocess_text(preds, labels):
 def compute(predictions, references):
     # ROUGE-N(unigram, bigram), ROUGE-L 측정
     rouge_types = ["rouge1", "rouge2", "rougeL"]
-    scorer = KoreanRougeScorer(rouge_types=rouge_types)
+    scorer = RougeScorer(rouge_types=rouge_types)
     aggregator = scoring.BootstrapAggregator()
     
     for ref, pred in zip(references, predictions):
@@ -81,34 +100,25 @@ def compute(predictions, references):
     return result
 
 
-def compute_metrics(eval_pred, tokenizer):
-    preds, labels = eval_pred
-    
-    # labels -100이면 교체
-    labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
-    
-    # 텍스트로 디코딩
-    decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-    decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-    
+def compute_metrics(diary, preds, labels, tokenizer):
     # post-processing
-    decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
+    preds, labels = postprocess_text(preds, labels)
     
     # ROUGE score 계산
-    result = compute(predictions=decoded_preds, references=decoded_labels)
+    result = compute(predictions=preds, references=labels)
     
     # median scores 추출
     result = {key: value.mid.fmeasure * 100 for key, value in result.items()}
 
     # BLEU Score 
-    len_decoded_labels = len(decoded_labels)
+    len_decoded_labels = len(labels)
     bleu_score_list_1 = np.zeros(len_decoded_labels)
     bleu_score_list_2 = np.zeros(len_decoded_labels)
     bleu_score_list_3 = np.zeros(len_decoded_labels)
     bleu_score_list_4 = np.zeros(len_decoded_labels)
 
     for i in range(len_decoded_labels):
-        matrix = bleu_score([decoded_preds[i]], [decoded_labels[i]])
+        matrix = bleu_score([preds[i]], [labels[i]])
         bleu_score_list_1[i] = matrix['bleu1']
         bleu_score_list_2[i] = matrix['bleu2']
         bleu_score_list_3[i] = matrix['bleu3']
@@ -119,24 +129,32 @@ def compute_metrics(eval_pred, tokenizer):
     result['bleu3'] = np.mean(bleu_score_list_3) * 100
     result['bleu4'] = np.mean(bleu_score_list_4) * 100
 
-    prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
+    #RDASS score 계산
+    result['rdass'] = rdass_score(diary, preds, labels)
+
+    prediction_lens = [len(tokenizer.encode(pred)) for pred in preds]
     result["gen_len"] = np.mean(prediction_lens)
     result = {k: round(v, 4) for k, v in result.items()}
     
     return result
 
 
-def get_model_func(config, args, config_args, tokenizer):
-    # config.eos_token_id = tokenizer.sep_token_id
-    # config.pad_token_id = tokenizer.pad_token_id
-    # config.forced_eos_token_id = tokenizer.eos_token_id
-    config.min_length = config_args.min_target_length
-    config.max_length = config_args.max_target_length
+def get_model_func(config, args, config_args):
+    config.min_length = config_args.min_length
     config.no_repeat_ngram_size = config_args.no_repeat_ngram_size
     config.early_stopping = config_args.early_stopping
     config.length_penalty = config_args.length_penalty
     config.num_labels = config_args.num_labels
     config.num_beams = config_args.num_beams 
 
-    model = AutoModelForSeq2SeqLM.from_pretrained(args.model_name_or_path, config=config)
+    model = GPT2LMHeadModel.from_pretrained(args.model_name_or_path, config=config)
     return model
+
+
+def preprocess_logits_for_metrics(logits, labels):
+    """
+    Original Trainer may have a memory leak. 
+    This is a workaround to avoid storing too many tensors that are not needed.
+    """
+    pred_ids = torch.argmax(logits[0], dim=-1)
+    return pred_ids, labels 
