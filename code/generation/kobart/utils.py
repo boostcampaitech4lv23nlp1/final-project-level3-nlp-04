@@ -8,7 +8,7 @@ from transformers import AutoModelForSeq2SeqLM
 from rouge_utils import *
 
 
-class KoreanRougeScorer(scoring.BaseScorer):
+class RougeScorer(scoring.BaseScorer):
     def __init__(self, rouge_types):
         self.rouge_types = rouge_types
         self.tokenizer = Mecab()
@@ -71,7 +71,7 @@ def postprocess_text(preds, labels):
 def compute(predictions, references):
     # ROUGE-N(unigram, bigram), ROUGE-L 측정
     rouge_types = ["rouge1", "rouge2", "rougeL"]
-    scorer = KoreanRougeScorer(rouge_types=rouge_types)
+    scorer = RougeScorer(rouge_types=rouge_types)
     aggregator = scoring.BootstrapAggregator()
     
     for ref, pred in zip(references, predictions):
