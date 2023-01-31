@@ -15,8 +15,5 @@ python inference.py \
 --save_steps=1000 \
 --save_total_limit=3 \
 --predict_with_generate=True \
---temperature 0.7 \
---min_target_length 30 \
---max_target_length 128 \
 --load_best_model_at_end \
 --evaluation_strategy steps
