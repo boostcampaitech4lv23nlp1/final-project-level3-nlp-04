@@ -54,7 +54,6 @@ def train():
     set_seed(training_args.seed)
 
     # config, tokenizer, model
-    # config = AutoConfig.from_pretrained(args.model_name_or_path)
     config = AutoConfig.from_pretrained(args.model_name_or_path)
 
     tokenizer = AutoTokenizer.from_pretrained(
@@ -62,10 +61,9 @@ def train():
 
     model = get_model_func(config, args, config_args, tokenizer)
     print("####### config: ", config)
-    print("####### model: ", model.config)
 
     # 데이터셋
-    dataset = datasets.load_dataset("nlp04/preprocessed_diary_dataset")
+    dataset = datasets.load_dataset("nlp04/diary_dataset")
     train_dataset = dataset["train"]
     eval_dataset = dataset["test"]
     train_dataset.shuffle(training_args.seed)
@@ -87,7 +85,7 @@ def train():
         tokenizer, pad_to_multiple_of=8 if training_args.fp16 else None, model = model
     )
 
-    metric_fn = partial(compute_metrics, tokenizer=tokenizer, inputs=tokenized_eval_dataset['input_ids'])
+    metric_fn = partial(compute_metrics, tokenizer=tokenizer)
     
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model.to(device)
@@ -148,13 +146,8 @@ def train():
     # evaluation
     trainer.evaluate(
         eval_dataset=tokenized_eval_dataset,
-        min_length=config_args.min_target_length,
         max_length=config_args.max_target_length,
-        num_beams=config_args.num_beams,
-        temperature=config_args.temperature,
-        do_sample=config_args.do_sample,
-        top_k=config_args.top_k,
-        top_p=config_args.top_p
+        num_beams=config_args.num_beams
     )
 
 if __name__ == "__main__":
