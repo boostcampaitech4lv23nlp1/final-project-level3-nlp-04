@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
 from datetime import datetime
 
-from config import CLF_MODEL_CKPT, CMT_MODEL_CKPT
+from config import CLF_MODEL_CKPT, CMT_MODEL_CKPT, TOP_K_RATIO
 
 
 diaries = dict()
@@ -79,7 +79,7 @@ async def make_diary(diary_in: DiaryIn):
     
     emotions = [top1]
     
-    if top1_logit * 0.9 <= top2_logit:
+    if top1_logit * TOP_K_RATIO <= top2_logit:
         emotions.append(top2)
     
     comment = cmt_model.comment_generation(diary_in.diary_content)
