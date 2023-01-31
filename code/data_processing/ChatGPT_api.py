@@ -3,11 +3,7 @@ from tqdm import tqdm
 import pandas as pd
 
 # put your api key
-openai.api_key = "***REMOVED***"
 model_engine = "text-davinci-003"
-# put your data path
-path = '../dataset/extra_diary.csv'
-
 def chatgpt(prompt):
     # Generate a response
     completion = openai.Completion.create(
