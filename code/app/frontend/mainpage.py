@@ -1,22 +1,14 @@
 import streamlit as st
 import base64
 import requests
+from configs import emotion_day
 
 # 서버에서의 streamlit 실행 방법
 # streamlit run mainpage.py --server.fileWatcherType none --server.port=30001
 
 
 st.markdown("""<style>
-@import url('https://fonts.googleapis.com/css?family=Jua&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Gowun+Dodum&display=swap');
-
-@font-face {
-    font-family: 'BMDoHyeon';
-    font-weight: normal; 
-    font-style: normal; 
-    src: url(https://cdn.jsdelivr.net/gh/webfontworld/woowahan/BMDoHyeon.woff2) format('woff2');
-    font-display: swap;
-}
 
 @font-face {
     font-family: 'Cafe24Shiningstar';
@@ -38,7 +30,7 @@ st.markdown("""<style>
     text-align: center;
     font-size: 20px;
     margin-bottom: 0px;
-    color: #969696; 
+    color: #8c8c8c; 
 }
 
 .diary_box{
@@ -83,6 +75,24 @@ st.markdown("""<style>
     }
 }
 
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes fadein { /* Safari and Chrome */
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
 
 .container{
     display: flex;
@@ -92,12 +102,15 @@ st.markdown("""<style>
     flex-wrap: nowrap;
 }
 
-.container_col{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin: 5px;
-    flex-wrap: nowrap;
+.text{
+    font-family: 'Gowun Dodum', serif;
+    text-align: center;
+    font-size: 15px;
+    margin-bottom: 0px;
+    color: #8c8c8c; 
+    animation: fadein 1s;
+    -webkit-animation: fadein 1s; /* Safari and Chrome */
+    animation-fill-mode: forwards;
 }
 
 .emotion_box{
@@ -105,19 +118,22 @@ st.markdown("""<style>
     justify-content: center;
     box-sizing: border-box;
     margin: 15px;
-    width: 150px;
+    width: auto;
+    align-items: center;
     border-stype: solid;
     border-width: 250px;
     background-color: #fff8dc;
     color: #5a5a5a;
     border-radius: 5px 5px;
     padding: 10px;
+    white-space: pre;
     display: flex;
 }
 
 .comment_box{
     font-family: 'Gowun Dodum', serif;
     background-color: #fff5ee;
+    align-items: center;
     color: #5a5a5a;
     box-sizing: border-box;
     margin: 15px;
@@ -126,8 +142,6 @@ st.markdown("""<style>
     border-radius: 5px 5px;
     padding: 10px;
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
 }
 
 
@@ -190,7 +204,7 @@ st.markdown('''
 st.markdown('<p class="subtitle">당신의 하루를 이야기해주세요.</p>', unsafe_allow_html=True)
 
 ## write diary
-diary = st.text_area(label='Please put your diary', key='diary_key', height=270, max_chars=700, label_visibility="hidden")
+diary = st.text_area(label='Please put your diary', key='diary_key', height=270, label_visibility="hidden")
 _, col, _ = st.columns([2.2]*2+[1.18])
 writting_btn = col.button("나의 하루 보내기")
 
@@ -199,24 +213,29 @@ user_diary = {'diary_content': diary}
 
 
 if writting_btn:
-    
-    response = requests.post("http://localhost:8080/diary", json=user_diary)
+    st.markdown(f'''
+    <br>
+    <div class="container">
+    <div class="text"> 당신의 하루에서 느껴지는<div class="emotion_box"; style="display:inline; color:#969696; margin:10px;">감정 해시태그</div>와 당신에게 들려주고 싶은 <div class="comment_box"; style="display:inline; color:#969696; margin:10px;"> 제 마음 </div>을 전할게요. </div>
+    </div>
+    <hr>
+    ''', unsafe_allow_html=True)
+
+    response = requests.post("http://115.85.181.5:30001/diary", json=user_diary)
     
     emotions = response.json()["emotions"]
     comment = response.json()['comment']
-    
-    st.markdown(f'''
+
+    ## 감정은 최대 top 2까지 출력되므로
+    if len(emotions) == 2:
+        str_emotions = emotion_day[emotions[0]]+'\n'+emotion_day[emotions[1]]
+    else:
+        str_emotions = emotion_day[emotions[0]]
+
+
+    st.markdown(f"""
     <div class="container">
-        <div class="emotion_box"> {emotions} </div>
+        <div class="emotion_box"> {str_emotions} </div>
         <div class="comment_box"> {comment} </div>
     </div>
-    ''', unsafe_allow_html=True)
-
-    # st.markdown(f'''
-    # <div class="container">
-    #     <div class="emotion_box"> #좋아요 <br> #행복 </div>
-    #     <div class="comment_box"> 그동안 고생을 많이 했군요! 앞으로 당신에게 펼쳐질 미래를 응원해요. 다음에는 이렇게 해보는건 어떨까요? </div>
-    # </div>
-    # ''', unsafe_allow_html=True)
-
-
+    """, unsafe_allow_html=True)
