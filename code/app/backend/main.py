@@ -37,7 +37,7 @@ def load_models():
     
     import os
     import sys
-    sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+    sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))))
     
     from sentiment_analysis.predict import SentimentAnalysis
     from generation.predict import CommentGeneration
@@ -56,8 +56,15 @@ def load_models():
 def read_root():
     return {"message": "FastAPI"}
 
+
+@app.get('/diary', description="일기 리스트를 가져옵니다")
+async def get_diaries() -> List[str]:
+    return diaries
+
+
+
 @app.post("/diary", description="일기작성")
-def make_diary(diary_in: DiaryIn):
+async def make_diary(diary_in: DiaryIn):
     
     _, _, all_scores = clf_model.sentiment_analysis(diary_in.diary_content)
     
@@ -85,16 +92,29 @@ def make_diary(diary_in: DiaryIn):
     
     diaries[str(diary_out.id)] = diary_out.dict()
     
-    return {'emotions': ",".join(emotions), 'comment': comment}
+    return diary_out.dict()
 
 
 @app.on_event("shutdown")
 def save_diaries():
+    import pandas as pd
+    
+    save_df = pd.DataFrame(columns=['id', 'diary', 'emotion', 'comment', 'created_at'])
+    
+    for diary_idx in diaries:
+        diary = diaries[diary_idx]
+        save_df = save_df.append({'id': diary['id'],
+                        'diary': diary['diary_content'],
+                        'emotion': ", ".join(diary['emotions']),
+                        'comment': diary['comment'],
+                        'created_at': diary['created_at'].strftime('%Y-%m-%d-%H-%M-%S-%f')}, ignore_index=True)
+    
+    save_df.to_csv('./log/' + datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f') + '.csv', index=False)
     return 0
        
     
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host='0.0.0.0', port=8080)
+    uvicorn.run("main:app", host='0.0.0.0', port=30001)
     
 

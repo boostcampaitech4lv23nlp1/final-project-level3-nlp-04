@@ -1,12 +1,17 @@
 import streamlit as st
 import pandas as pd
 from sentiment_analysis.predict import SentimentAnalysis
-from generation.predict import CommentGeneration
+from generation.kobart.predict import CommentGeneration
+import re
+
+
 
 # 실행 방법
 # streamlit run main.py --server.fileWatcherType none --server.port=30001
-s_preds = SentimentAnalysis("JunHyung1206/kote_sentiment_roberta_large")
-c_preds = CommentGeneration("./generation/models/total_comment_emotion")
+s_preds = SentimentAnalysis("nlp04/kote_sentiment_roberta_large")
+c_preds = CommentGeneration("nlp04/kobart_8_5.6e-5_default_option")
+c_preds2 = CommentGeneration("nlp04/kobart_8_5.6e-5_min30_lp4_sample")
+
 st.title("ProtoType")
 if 'input' not in st.session_state:
     st.session_state["input"] = ''
@@ -27,8 +32,13 @@ if submit:
     values = [all_score[i] for i in index]
     
     st.markdown('---')
-    st.markdown('### Comment')
+    st.markdown('### nlp04/kobart_8_5.6e-5_default_option Comment')
     st.write(c_preds.comment_generation(st.session_state['input']))
+    st.markdown("---")
+    st.markdown('### nlp04/kobart_8_5.6e-5_min30_lp4_sample Comment')
+    comment = c_preds2.comment_generation(st.session_state['input'])
+    st.write(comment)
+    
     chart_data = pd.DataFrame(values, index=index, columns=["result"])
     
     
