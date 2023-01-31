@@ -40,7 +40,7 @@ def load_models():
     sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))))
     
     from sentiment_analysis.predict import SentimentAnalysis
-    from generation.predict import CommentGeneration
+    from generation.kobart.predict import CommentGeneration
     
     global clf_model, cmt_model
     
