@@ -5,12 +5,10 @@ from konlpy.tag import Mecab
 from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
 from rouge_score import scoring
 from transformers import AutoModelForSeq2SeqLM
-from sentence_transformers import SentenceTransformer 
-from sklearn.metrics.pairwise import cosine_similarity
 from rouge_utils import *
 
 
-class KoreanRougeScorer(scoring.BaseScorer):
+class RougeScorer(scoring.BaseScorer):
     def __init__(self, rouge_types):
         self.rouge_types = rouge_types
         self.tokenizer = Mecab()
@@ -64,23 +62,6 @@ def bleu_score(predictions, references):
     return matrix
 
 
-def rdass_score(inputs, predictions, references):
-    model = SentenceTransformer('snunlp/KR-SBERT-V40K-klueNLI-augSTS')
-    
-    V_d = model.encode(inputs)
-    V_r = model.encode(references)
-    V_p = model.encode(predictions)
-    
-    s_pr = cosine_similarity(V_p, V_r)
-    s_pd = cosine_similarity(V_p, V_d)
-    
-    RDASS = (s_pr + s_pd) / 2
-
-    RDASS_mean = RDASS.diagonal().mean()
-    
-    return RDASS_mean
-
-
 def postprocess_text(preds, labels):
     preds = [pred.strip() for pred in preds]
     labels = [label.strip() for label in labels]
@@ -90,7 +71,7 @@ def postprocess_text(preds, labels):
 def compute(predictions, references):
     # ROUGE-N(unigram, bigram), ROUGE-L 측정
     rouge_types = ["rouge1", "rouge2", "rougeL"]
-    scorer = KoreanRougeScorer(rouge_types=rouge_types)
+    scorer = RougeScorer(rouge_types=rouge_types)
     aggregator = scoring.BootstrapAggregator()
     
     for ref, pred in zip(references, predictions):
@@ -100,7 +81,7 @@ def compute(predictions, references):
     return result
 
 
-def compute_metrics(eval_pred, tokenizer, inputs):
+def compute_metrics(eval_pred, tokenizer):
     preds, labels = eval_pred
     
     # labels -100이면 교체
@@ -113,17 +94,6 @@ def compute_metrics(eval_pred, tokenizer, inputs):
     # post-processing
     decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
     
-
-    decoded_inputs = tokenizer.batch_decode(inputs, skip_special_tokens=True)
-    # print('### diary: ', decoded_inputs[0])
-
-    # print
-    print('### decoded_preds: ', decoded_preds[0])
-    print('### decoded_preds: ', decoded_preds[1])
-    print('### decoded_preds: ', decoded_preds[2])
-    print('### decoded_preds: ', decoded_preds[3])
-    print('### decoded_preds: ', decoded_preds[4])
-
     # ROUGE score 계산
     result = compute(predictions=decoded_preds, references=decoded_labels)
     
@@ -143,9 +113,6 @@ def compute_metrics(eval_pred, tokenizer, inputs):
         bleu_score_list_2[i] = matrix['bleu2']
         bleu_score_list_3[i] = matrix['bleu3']
         bleu_score_list_4[i] = matrix['bleu4']
-
-    #RDASS score 계산
-    result['rdass'] = rdass_score(decoded_inputs, decoded_preds, decoded_labels)
         
     result['bleu1'] = np.mean(bleu_score_list_1) * 100
     result['bleu2'] = np.mean(bleu_score_list_2) * 100
@@ -163,10 +130,6 @@ def get_model_func(config, args, config_args, tokenizer):
     # config.eos_token_id = tokenizer.sep_token_id
     # config.pad_token_id = tokenizer.pad_token_id
     # config.forced_eos_token_id = tokenizer.eos_token_id
-    config.do_sample = config_args.do_sample
-    config.top_k = config_args.top_k
-    config.top_p = config_args.top_p
-    config.temperature = config_args.temperature
     config.min_length = config_args.min_target_length
     config.max_length = config_args.max_target_length
     config.no_repeat_ngram_size = config_args.no_repeat_ngram_size
