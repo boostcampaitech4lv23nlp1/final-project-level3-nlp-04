@@ -47,10 +47,10 @@ class CommentGeneration():
         model_outputs = self.model.generate(input_ids, eos_token_id=self.tokenizer.eos_token_id, 
                                             max_length=self.max_target_length, 
                                             min_length = 30, 
-                                            num_beams=5, 
+                                            num_beams=10, 
                                             do_sample=True,
                                             temperature=1.0,
-                                            top_k=30,
+                                            top_k=50,
                                             top_p=0.92,
                                             length_penalty=0.5,
                                             )
@@ -61,9 +61,18 @@ class CommentGeneration():
         #print(comment)
         
         while err_char.search(comment):
-            model_outputs = self.model.generate(input_ids, eos_token_id=self.tokenizer.eos_token_id, max_length=self.max_target_length, min_length = 30, num_beams=10,temperature=1)
+            model_outputs = self.model.generate(input_ids, eos_token_id=self.tokenizer.eos_token_id, 
+                                            max_length=self.max_target_length, 
+                                            min_length = 30, 
+                                            num_beams=10, 
+                                            do_sample=True,
+                                            temperature=1.0,
+                                            top_k=50,
+                                            top_p=0.92,
+                                            length_penalty=0.5,
+                                            )
             comment = self.tokenizer.decode(model_outputs[0],skip_special_tokens=True)
-        
+            comment = self.spell_check_and_spacing([comment])
         return self.post_processing(comment)
     
     def spell_check_and_spacing(self, array):
