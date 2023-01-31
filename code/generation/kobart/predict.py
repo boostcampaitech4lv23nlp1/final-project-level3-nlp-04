@@ -72,7 +72,7 @@ class CommentGeneration():
                                             length_penalty=0.5,
                                             )
             comment = self.tokenizer.decode(model_outputs[0],skip_special_tokens=True)
-            comment = self.spell_check_and_spacing([comment])
+            comment = self.spell_check_and_spacing([comment])[0]
         return self.post_processing(comment)
     
     def spell_check_and_spacing(self, array):
