@@ -33,6 +33,18 @@ class Arguments:
         },
     )
 
+    top_k : int = field(
+        default=50,
+    )
+
+    top_p : float = field(
+        default=0.92,
+    )
+
+    temperature : float = field(
+        default=0.9,
+    )
+
     wandb_project: str = field(
         default="None_project",
     )
@@ -51,13 +63,8 @@ class ConfigArguments:
     """
     Arguments for config setting
     """
-
-    min_target_length: int = field(
-        default=1
-    )
-
-    max_target_length: int = field(
-        default=128
+    min_length : int = field(
+        default=35
     )
 
     no_repeat_ngram_size: int = field(
@@ -69,7 +76,7 @@ class ConfigArguments:
     )
 
     length_penalty: float = field(
-        default=0.0
+        default=5.0
     )
 
     num_labels: int = field(
@@ -77,5 +84,5 @@ class ConfigArguments:
     )
 
     num_beams: int = field(
-        default=4
+        default=5
     )
