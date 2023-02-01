@@ -6,7 +6,8 @@ from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
 from rouge_score import scoring
 from transformers import AutoModelForSeq2SeqLM
 from rouge_utils import *
-
+from sentence_transformers import SentenceTransformer 
+from sklearn.metrics.pairwise import cosine_similarity
 
 class RougeScorer(scoring.BaseScorer):
     def __init__(self, rouge_types):
