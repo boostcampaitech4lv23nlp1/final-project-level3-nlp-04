@@ -66,7 +66,7 @@ def main():
         tokenizer, pad_to_multiple_of=8 if training_args.fp16 else None, model = model
     )
 
-    metric_fn = partial(compute_metrics, tokenizer=tokenizer)
+    metric_fn = partial(compute_metrics, tokenizer=tokenizer, inputs=tokenized_test_dataset['input_ids'])
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model.to(device)

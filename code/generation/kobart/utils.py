@@ -6,7 +6,8 @@ from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
 from rouge_score import scoring
 from transformers import AutoModelForSeq2SeqLM
 from rouge_utils import *
-
+from sentence_transformers import SentenceTransformer 
+from sklearn.metrics.pairwise import cosine_similarity
 
 class RougeScorer(scoring.BaseScorer):
     def __init__(self, rouge_types):
@@ -61,6 +62,21 @@ def bleu_score(predictions, references):
     }
     return matrix
 
+def rdass_score(inputs, predictions, references):
+    model = SentenceTransformer('snunlp/KR-SBERT-V40K-klueNLI-augSTS')
+    
+    V_d = model.encode(inputs)
+    V_r = model.encode(references)
+    V_p = model.encode(predictions)
+    
+    s_pr = cosine_similarity(V_p, V_r)
+    s_pd = cosine_similarity(V_p, V_d)
+    
+    RDASS = (s_pr + s_pd) / 2
+
+    RDASS_mean = RDASS.diagonal().mean()
+    
+    return RDASS_mean
 
 def postprocess_text(preds, labels):
     preds = [pred.strip() for pred in preds]
@@ -81,7 +97,7 @@ def compute(predictions, references):
     return result
 
 
-def compute_metrics(eval_pred, tokenizer):
+def compute_metrics(eval_pred, tokenizer, inputs):
     preds, labels = eval_pred
     
     # labels -100이면 교체
@@ -90,7 +106,7 @@ def compute_metrics(eval_pred, tokenizer):
     # 텍스트로 디코딩
     decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
     decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-    
+    decoded_inputs = tokenizer.batch_decode(inputs, skip_special_tokens=True)
     # post-processing
     decoded_preds, decoded_labels = postprocess_text(decoded_preds, decoded_labels)
     
@@ -119,6 +135,8 @@ def compute_metrics(eval_pred, tokenizer):
     result['bleu3'] = np.mean(bleu_score_list_3) * 100
     result['bleu4'] = np.mean(bleu_score_list_4) * 100
 
+    #RDASS score 계산
+    result['rdass'] = rdass_score(decoded_inputs, decoded_preds, decoded_labels)
     prediction_lens = [np.count_nonzero(pred != tokenizer.pad_token_id) for pred in preds]
     result["gen_len"] = np.mean(prediction_lens)
     result = {k: round(v, 4) for k, v in result.items()}

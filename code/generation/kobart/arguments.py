@@ -79,3 +79,16 @@ class ConfigArguments:
     num_beams: int = field(
         default=4
     )
+    temperature: float = field(
+        default=1.0
+    )
+    do_sample : bool = field(
+        default=True
+    )
+    top_k: int = field(
+        default=0
+    )
+    top_p: float = field(
+        default=1.0
+    )
+    
