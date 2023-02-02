@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from sentiment_analysis.predict import SentimentAnalysis
-from generation.predict import CommentGeneration
+from generation.kobart.predict import CommentGeneration
 import re
 
 
