@@ -97,7 +97,7 @@ class CommentGeneration():
 
     def spacing_spell_check_and_correct(self, array):
         if not len(array):
-            raise Exception('3의 배수가 아닙니다.')
+            raise Exception
         array = [emoticon_normalize(x, num_repeats=2) for x in array] # nomalize 먼저
         result = self.spell_check_(array) # 맞춤법 교정
         return result    
