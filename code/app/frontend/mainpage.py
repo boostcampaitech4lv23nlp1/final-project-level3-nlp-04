@@ -204,7 +204,7 @@ st.markdown('''
 st.markdown('<p class="subtitle">당신의 하루를 이야기해주세요.</p>', unsafe_allow_html=True)
 
 ## write diary
-diary = st.text_area(label='Please put your diary', key='diary_key', height=270, label_visibility="hidden")
+diary = st.text_area(label='Please put your diary', placeholder = '일기를 최소 20자 이상 작성해주세요!', key='diary_key', height=270, label_visibility="hidden")
 _, col, _ = st.columns([2.2]*2+[1.18])
 writting_btn = col.button("나의 하루 보내기")
 
@@ -221,7 +221,7 @@ if writting_btn:
     <hr>
     ''', unsafe_allow_html=True)
 
-    response = requests.post("http://115.85.181.5:30001/diary", json=user_diary)
+    response = requests.post("http://115.85.181.5:30002/diary", json=user_diary)
     
     emotions = response.json()["emotions"]
     comment = response.json()['comment']
