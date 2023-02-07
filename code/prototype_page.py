@@ -5,7 +5,6 @@ from generation.kobart.predict import CommentGeneration
 import re
 
 
-
 # 실행 방법
 # streamlit run main.py --server.fileWatcherType none --server.port=30001
 s_preds = SentimentAnalysis("nlp04/kote_sentiment_roberta_large")
