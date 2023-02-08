@@ -133,4 +133,4 @@ streamlit run prototype_page.py --server.fileWatcherType none --server.port=3000
 
 ### 시연영상
 
-[NLP4조_시연영상.mp4](assets/testing.gif)
+![testing.gif](assets/testing.gif)
