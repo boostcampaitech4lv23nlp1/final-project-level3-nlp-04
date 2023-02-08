@@ -133,4 +133,4 @@ streamlit run prototype_page.py --server.fileWatcherType none --server.port=3000
 
 ### 시연영상
 
-[NLP4조_시연영상.mp4](assets/NLP4%25E1%2584%258C%25E1%2585%25A9_%25E1%2584%2589%25E1%2585%25B5%25E1%2584%258B%25E1%2585%25A7%25E1%2586%25AB%25E1%2584%258B%25E1%2585%25A7%25E1%2586%25BC%25E1%2584%2589%25E1%2585%25A1%25E1%2586%25BC.mp4)
+[NLP4조_시연영상.mp4](assets/testing.gif)
