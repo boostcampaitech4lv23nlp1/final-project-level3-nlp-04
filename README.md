@@ -112,12 +112,12 @@ streamlit run prototype_page.py --server.fileWatcherType none --server.port=3000
 
 ### Human evaluation 가이드라인
 
-**코멘트생성 Human evaluation 가이드라인**
+**코멘트생성 Human evaluation 가이드라인** [[link]](https://github.com/boostcampaitech4lv23nlp1/final-project-level3-nlp-04/blob/9d706617e5fe503b55407883d58b9a5517f29972/docs/%EC%BD%94%EB%A9%98%ED%8A%B8%EC%83%9D%EC%84%B1_Human_evaluation_%EA%B0%80%EC%9D%B4%EB%93%9C%EB%9D%BC%EC%9D%B8.pdf)
 
 - 기존 평가지표의 문제: 정답 문장과 생성 문장이 의미적으로 유사하다고 해서 사용자가 해당 코멘트에 반드시 만족한다고 볼 수는 없음
 - 새로운 가이드라인 제시: 사용자의 입장에서 해당 코멘트가 만족스러운 코멘트인지도 평가해보기 위해 SSSA(Sensibleness and Specificity and Sympathy Average)라는 지표를 만들어 평가
 
-**감성분석 Human evaluation 가이드라인**
+**감성분석 Human evaluation 가이드라인** [[link]](https://github.com/boostcampaitech4lv23nlp1/final-project-level3-nlp-04/blob/9d706617e5fe503b55407883d58b9a5517f29972/docs/%EA%B0%90%EC%84%B1%EB%B6%84%EC%84%9D_Human_evaluation_%EA%B0%80%EC%9D%B4%EB%93%9C%EB%9D%BC%EC%9D%B8.pdf)
 
 - 기존 평가지표의 문제: 각 감정 사이의 유사도를 반영하지 못함
 - 새로운 가이드라인 제시: 사용자의 입장에서 느낀 감정과 모델이 분류한 감정의 일치도를 0에서 2까지 점수로 나타냄
