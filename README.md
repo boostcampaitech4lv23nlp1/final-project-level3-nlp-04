@@ -4,7 +4,7 @@
 
 ### 기획 의도
 
-<center><img src="assets/%25EB%2584%2588%25ED%2595%2598%25EA%25B6%2581.png" width="430" height="400"></center>
+<p align='center'><img src="assets/%25EB%2584%2588%25ED%2595%2598%25EA%25B6%2581.png" width="430" height="400"></p>
 
 ‘너하궁’은 공감과 위로를 받고 싶은 순간, 일기장에 따뜻한 말 한마디를 적어 주시던 선생님처럼 누군가 내 하루의 이야기를 들어주고, 나의 감정에 공감해준다면 어떨까?라는 기획의도에서 시작되었습니다. 
 그래서 저희 서비스는 사용자가 일기를 입력하면 감성을 분석하고, 일기의 내용을 공감해주는 코멘트를 출력하도록 구성되었습니다.
@@ -105,7 +105,7 @@ streamlit run prototype_page.py --server.fileWatcherType none --server.port=3000
 
 **감성분석 아키텍쳐**
 
-<center><img src="assets/%25EA%25B0%2590%25EC%2584%25B1%25EB%25B6%2584%25EC%2584%259D_%25EC%259E%2585%25EC%25B6%259C%25EB%25A0%25A5.png" width="300" height="300"></center>
+<p align='center'><img src="assets/%25EA%25B0%2590%25EC%2584%25B1%25EB%25B6%2584%25EC%2584%259D_%25EC%259E%2585%25EC%25B6%259C%25EB%25A0%25A5.png" width="300" height="300"></p>
 
 - 일기를 받아 일기에 맞는 감정을 생성
 - 토큰화된 일기가 인코더를 거치고, 그 중 CLS 토큰 벡터를 사용하여 감정을 분류
