@@ -97,7 +97,7 @@ streamlit run prototype_page.py --server.fileWatcherType none --server.port=3000
 
 **코멘트 생성 아키텍처**
 
-![그림6.png](assets/%25EA%25B7%25B8%25EB%25A6%25BC6.png)
+![그림6.png](assets/comment_generation_architecture.png)
 
 - 맞춤법 교정을 거친 일기 텍스트를 입력 받아서 일기 내용에 공감하는 코멘트를 출력
 - 너무 유사한 문장을 반복하지 않도록, 생성 결과에서 유사 문장을 제거하는 후처리 과정을 거침
