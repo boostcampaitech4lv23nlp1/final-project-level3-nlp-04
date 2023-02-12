@@ -1,12 +1,16 @@
-# 너하궁🌙 (너의 하루가 궁금해)
+# 너하궁🌙 (너의 하루가 궁금해)  
 
+><a href="https://www.youtube.com/watch?v=w-yj8gZ8As8&t=2s"><img src="https://img.shields.io/badge/Presentation video-F3F3F3?style=for-the-badge&logo=youtube&logoColor=fc2403"/></a>  
+<a href="https://github.com/boostcampaitech4lv23nlp1/final-project-level3-nlp-04/blob/main/docs/NLP_04_%EC%9D%BC%EA%B8%B0%20%EA%B0%90%EC%84%B1%EB%B6%84%EC%84%9D%20%EB%B0%8F%20%EC%BD%94%EB%A9%98%ED%8A%B8%20%EC%83%9D%EC%84%B1%20%EC%84%9C%EB%B9%84%EC%8A%A4.pdf"><img src="https://img.shields.io/badge/Presentation (Pdf)-F3F3F3?style=for-the-badge&logo=Microsoft PowerPoint&logoColor=B7472A"/></a>  
+<a href="https://github.com/boostcampaitech4lv23nlp1/final-project-level3-nlp-04/tree/main/docs"><img src="https://img.shields.io/badge/Guideline (Pdf)-F3F3F3?style=for-the-badge&logo=Google Sheets&logoColor=34A853"/></a>  
+  
 ## 프로젝트 소개
 
 ### 기획 의도
 
 <p align='center'><img src="assets/%25EB%2584%2588%25ED%2595%2598%25EA%25B6%2581.png" width="430" height="400"></p>
 
->‘**너하궁**’은 공감과 위로를 받고 싶은 순간, 일기장에 따뜻한 말 한마디를 적어 주시던 선생님처럼 누군가 내 하루의 이야기를 들어주고, 나의 감정에 공감해준다면 어떨까?라는 기획의도에서 시작되었습니다. 
+>‘**너하궁**’은 '공감과 위로를 받고 싶은 순간, 일기장에 따뜻한 말 한마디를 적어 주시던 선생님처럼 누군가 내 하루의 이야기를 들어주고, 나의 감정에 공감해준다면 어떨까?'라는 기획의도에서 시작되었습니다. 
 그래서 저희 서비스는 사용자가 일기를 입력하면 감성을 분석하고, 일기의 내용을 공감해주는 코멘트를 출력하도록 구성되었습니다.
 
 ### 팀 소개
