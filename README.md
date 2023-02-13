@@ -2,6 +2,7 @@
 
 ><a href="https://www.youtube.com/watch?v=w-yj8gZ8As8"><img src="https://img.shields.io/badge/Presentation video-F3F3F3?style=for-the-badge&logo=youtube&logoColor=fc2403"/></a>  
 <a href="https://github.com/boostcampaitech4lv23nlp1/final-project-level3-nlp-04/blob/main/docs/NLP_04_%EC%9D%BC%EA%B8%B0%20%EA%B0%90%EC%84%B1%EB%B6%84%EC%84%9D%20%EB%B0%8F%20%EC%BD%94%EB%A9%98%ED%8A%B8%20%EC%83%9D%EC%84%B1%20%EC%84%9C%EB%B9%84%EC%8A%A4.pdf"><img src="https://img.shields.io/badge/Presentation (Pdf)-F3F3F3?style=for-the-badge&logo=Microsoft PowerPoint&logoColor=B7472A"/></a>  
+<a href="https://leeyeryeong.notion.site/Wrap-Up-Report-ad3ea025a1a04e1fadd64f9ee4724a04"><img src="https://img.shields.io/badge/Wrap Up Report-F3F3F3?style=for-the-badge&logo=Notion&logoColor=000000"/></a>  
 <a href="https://github.com/boostcampaitech4lv23nlp1/final-project-level3-nlp-04/tree/main/docs"><img src="https://img.shields.io/badge/Guideline (Pdf)-F3F3F3?style=for-the-badge&logo=Google Sheets&logoColor=34A853"/></a>  
   
 ## 프로젝트 소개
