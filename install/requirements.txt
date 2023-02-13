@@ -8,7 +8,7 @@ streamlit==1.17.0
 transformers==4.25.1
 tweepy==3.10.0
 wandb
-torch==1.13
+torch==1.13.1
 accelerate
 pandas
 rouge-score
