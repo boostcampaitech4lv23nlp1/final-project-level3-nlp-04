@@ -1,7 +1,7 @@
 datasets==2.7.1
 fastapi==0.89.1
 glob2==0.7
-numpy==1.20.3
+numpy==1.22.0
 kss==4.5.1
 sagemaker-training==4.4.1
 streamlit==1.17.0
